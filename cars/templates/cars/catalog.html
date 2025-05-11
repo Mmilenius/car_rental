@@ -62,7 +62,7 @@
                             <a href="{% url 'catalog:car' car.slug %}">
                                 <p class="card-title">{{ car.name }}</p>
                             </a>
-                            <p class="card-text text-truncate">{{ car.description }}</p>
+                            <p class="card-text ">{{ car.description|truncatechars:60 }}</p>
                             <p class="product_id">id:{{ car.displey_id }}</p>
                             <div class="d-flex justify-content-between">
                                 {% if car.discount %}
@@ -86,14 +86,25 @@
             <nav aria-label="Page navigation example">
                 <ul class="pagination justify-content-center my-4">
                     <div class="custom-shadow d-flex">
-                        <li class="page-item disabled">
-                            <a class="page-link">Попередня</a>
+                        <li class="page-item {% if not cars.has_previous %} disabled {% endif %}">
+                            <a class="page-link" href='{% if cars.has_previous %}?page={{ cars.previous_page_number }}{% else %}
+
+                            {% endif %}'>Попередня</a>
                         </li>
-                        <li class="page-item"><a class="page-link" href="#">1</a></li>
-                        <li class="page-item"><a class="page-link" href="#">2</a></li>
-                        <li class="page-item"><a class="page-link" href="#">3</a></li>
-                        <li class="page-item">
-                            <a class="page-link" href="#">Наступна</a>
+                        
+                        {% for page in cars.paginator.page_range %}
+                            {% if page >= cars.number|add:-2 and page <= cars.number|add:2 %}
+                            	<li class="page-item" {% if cars.number == page %} active{% endif %}>
+                                    <a class="page-link" href="?page={{ page }}">{{ page }}</a>
+                             </li>
+                            {% endif %}
+                        {% endfor %}
+
+                        <li class="page-item {% if not cars.has_next %} disabled {% endif %}">
+                            <a class="page-link" href='{% if cars.has_next %}?page={{ cars.next_page_number}}{% else %}
+
+                            {% endif %}'>Наступна</a>
+
                         </li>
                     </div>
                 </ul>

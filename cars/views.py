@@ -1,16 +1,24 @@
-from django.shortcuts import render, get_object_or_404
+from django.core.paginator import Paginator
+from django.shortcuts import render, get_object_or_404, get_list_or_404
 
 from cars.models import Cars  # не імпортуй модуль cars, бо це ім’я конфліктує
 
 def catalog(request, category_slug):
 
+    page = request.GET.get('page',1)
+
     if category_slug == 'all':
         all_cars = Cars.objects.all()
     else:
-        all_cars = get_object_or_404(Cars.objects.filter(category__slug=category_slug))
+        all_cars = get_list_or_404(Cars.objects.filter(category__slug=category_slug))
+
+    paginator = Paginator(all_cars, 4)
+    current_page = paginator.page(int(page))
+
     context = {
         'title': 'Home - Каталог ',
-        'cars': all_cars,
+        'cars': current_page,
+        'slug_url': category_slug,
     }
     return render(request, 'cars/catalog.html', context)
 

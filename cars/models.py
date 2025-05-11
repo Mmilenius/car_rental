@@ -25,6 +25,7 @@ class Cars(models.Model):
         db_table = 'car'
         verbose_name = 'Машину'
         verbose_name_plural = 'Машини'
+        ordering = ('id',)
 
     def __str__(self):
         return self.name
