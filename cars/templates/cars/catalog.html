@@ -1,6 +1,6 @@
 {% extends 'main/base.html' %}
 {% load static %}
-
+{% load cars_tags %}
 {% block content %}
 <!-- Контент -->
 <div class="container">
@@ -18,29 +18,32 @@
                         Фільтри
                     </button>
 
-                    <form action="" method="get" class="dropdown-menu bg-dark" data-bs-theme="dark">
+                    <form action="{% url 'catalog:index' slug_url %}" method="get" class="dropdown-menu bg-dark" data-bs-theme="dark">
                         <div class="form-check text-white mx-3">
-                            <input class="form-check-input" type="checkbox" name="on_sale" id="flexCheckDefault" value="on">
-                            <input type="hidden" name="q" value="request.GET.q">
+                            <input class="form-check-input" type="checkbox" name="on_sale" id="flexCheckDefault" value="on" {% if request.GET.on_sale == 'on' %}checked{% endif %}>
+                            {% comment %}
+                            	<input type="hidden" name="q" value="request.GET.q">
+                            {% endcomment %}
                             <label class="form-check-label" for="flexCheckDefault">
                                 Авто за акцією
                             </label>
                         </div>
                         <p class="text-white mx-3 mt-3">Сортувати:</p>
                         <div class="form-check text-white mx-3">
-                            <input class="form-check-input" type="radio" name="order_by" id="flexRadioDefault1" value="default" checked>
+                            <input class="form-check-input" type="radio" name="order_by" id="flexRadioDefault1" value="default"
+                            {% if request.GET.order_by or request.GET.order_by == 'default' %}checked{% endif %}>
                             <label class="form-check-label" for="flexRadioDefault1">
                                 За замовчуванням
                             </label>
                         </div>
                         <div class="form-check text-white mx-3">
-                            <input class="form-check-input" type="radio" name="order_by" id="flexRadioDefault2" value="price">
+                            <input class="form-check-input" type="radio" name="order_by" id="flexRadioDefault2" value="price"{% if request.GET.order_by == 'price' %}checked{% endif %}>
                             <label class="form-check-label" for="flexRadioDefault2">
                                 Від дешевих до дорогих
                             </label>
                         </div>
                         <div class="form-check text-white mx-3">
-                            <input class="form-check-input" type="radio" name="order_by" id="flexRadioDefault3" value="-price">
+                            <input class="form-check-input" type="radio" name="order_by" id="flexRadioDefault3" value="-price"{% if request.GET.order_by == '-price' %}checked{% endif %}>
                             <label class="form-check-label" for="flexRadioDefault3">
                                 Від дорогих до дешевих
                             </label>
@@ -87,7 +90,7 @@
                 <ul class="pagination justify-content-center my-4">
                     <div class="custom-shadow d-flex">
                         <li class="page-item {% if not cars.has_previous %} disabled {% endif %}">
-                            <a class="page-link" href='{% if cars.has_previous %}?page={{ cars.previous_page_number }}{% else %}
+                            <a class="page-link" href='{% if cars.has_previous %}?{%  change_params page=cars.previous_page_number %}{% else %}
 
                             {% endif %}'>Попередня</a>
                         </li>
@@ -95,13 +98,13 @@
                         {% for page in cars.paginator.page_range %}
                             {% if page >= cars.number|add:-2 and page <= cars.number|add:2 %}
                             	<li class="page-item" {% if cars.number == page %} active{% endif %}>
-                                    <a class="page-link" href="?page={{ page }}">{{ page }}</a>
+                                    <a class="page-link" href="?{%  change_params page=page %}">{{ page }}</a>
                              </li>
                             {% endif %}
                         {% endfor %}
 
                         <li class="page-item {% if not cars.has_next %} disabled {% endif %}">
-                            <a class="page-link" href='{% if cars.has_next %}?page={{ cars.next_page_number}}{% else %}
+                            <a class="page-link" href='{% if cars.has_next %}?{%  change_params page=cars.next_page_number %}{% else %}
 
                             {% endif %}'>Наступна</a>
 
