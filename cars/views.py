@@ -2,15 +2,20 @@ from django.core.paginator import Paginator
 from django.shortcuts import render, get_object_or_404, get_list_or_404
 
 from cars.models import Cars  # не імпортуй модуль cars, бо це ім’я конфліктує
+from cars.utilits import q_search
 
-def catalog(request, category_slug):
+
+def catalog(request, category_slug=None):
 
     order_by = request.GET.get('order_by', None)
     on_sale = request.GET.get('on_sale', None)
     page = request.GET.get('page', 1)
+    query = request.GET.get('q', None)
 
     if category_slug == 'all':
         all_cars = Cars.objects.all()
+    elif  query:
+        all_cars= q_search(query)
     else:
         all_cars = get_list_or_404(Cars.objects.filter(category__slug=category_slug))
 
