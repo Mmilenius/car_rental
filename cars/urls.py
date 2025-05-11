@@ -22,6 +22,6 @@ from cars import views
 app_name = 'cars'
 
 urlpatterns = [
-    path('', views.catalog, name='index'),
+    path('<slug:category_slug>/', views.catalog, name='index'),
     path('car/<slug:car_slug>/', views.car, name='car'),
 ]
