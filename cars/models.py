@@ -28,3 +28,11 @@ class Cars(models.Model):
 
     def __str__(self):
         return self.name
+
+    def displey_id(self):
+        return f'{self.id:04}'
+
+    def price_for_sell(self):
+        if self.discount:
+            return round(self.price - self.price*self.discount/100, 2)
+        return self.price
