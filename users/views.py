@@ -1,9 +1,9 @@
 from django.contrib import auth
 from django.http import HttpResponseRedirect
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.urls import reverse
 
-from users.forms import UserLoginForm
+from users.forms import UserLoginForm, UserRegistationForm
 
 
 # Create your views here.
@@ -27,8 +27,20 @@ def login(request):
     return render(request, 'users/login.html', contex)
 
 def registration(request):
+
+    if request.method == 'POST':
+        form = UserRegistationForm(data=request.POST)
+        if form.is_valid():
+            form.save()
+            user = form.instance
+            auth.login(request, user)
+            return HttpResponseRedirect(reverse('users:login'))
+    else:
+        form = UserRegistationForm()
+
     contex = {
-        'title': 'Home - Реєстрація'
+        'title': 'Home - Реєстрація',
+        'form': form,
     }
     return render(request, 'users/registration.html', contex)
 
@@ -39,7 +51,7 @@ def profile(request):
     return render(request, 'users/profile.html', contex)
 
 def logout(request):
-    contex = {
-        'title': 'Home - Вихід'
-    }
-    return render(request, '', contex)
+
+    auth.logout(request)
+    return redirect(reverse('main:index'))
+
