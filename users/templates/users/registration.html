@@ -34,7 +34,7 @@
                                                value="{% if form.last_name.value %}{{ form.last_name.value }}{% endif %}"
                                                name="last_name"
                                                placeholder="Введіть ваше прізвище" required>
-                                               {% if form.second_name.errors %}
+                                               {% if form.last_name.errors %}
                                                <div class="alert alert-danger alert-dismissible fade show">{{ form.last_name.errors }}</div>
                                                {% endif %}
                                     </div>
