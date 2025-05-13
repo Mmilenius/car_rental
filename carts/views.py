@@ -54,4 +54,23 @@ def carts_remove(request):
     return JsonResponse(response_data)
 
 def carts_change(request):
-    ...
+    cart_id = request.POST.get("cart_id")
+    period = int(request.POST.get("period"))
+
+    cart = Cart.objects.get(id=cart_id)
+    cart.period = period
+    cart.save()
+
+    updated_period = cart.period
+    cart = get_user_carts(request)
+
+    cart_items_html = render_to_string(
+        "carts/includes/included_cart.html", {'carts': cart}, request=request)
+
+    responce_data = {
+        "message": "Період оновлено",
+        "cart_items_html": cart_items_html,
+        "period": updated_period,
+    }
+
+    return JsonResponse(responce_data)

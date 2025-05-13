@@ -126,13 +126,13 @@ $(document).ready(function () {
         updateCart(cartID, currentValue + 1, 1, url);
     });
 
-    function updateCart(cartID, quantity, change, url) {
+    function updateCart(cartID, period, change, url) {
         $.ajax({
             type: "POST",
             url: url,
             data: {
                 cart_id: cartID,
-                quantity: quantity,
+                period: period,
                 csrfmiddlewaretoken: $("[name=csrfmiddlewaretoken]").val(),
             },
             success: function (data) {
@@ -141,11 +141,6 @@ $(document).ready(function () {
                 setTimeout(function () {
                     successMessage.fadeOut(400);
                 }, 7000);
-
-                var carsInCartCount = $("#cars-in-cart-count");
-                var cartCount = parseInt(carsInCartCount.text() || 0);
-                cartCount += change;
-                carsInCartCount.text(cartCount);
 
                 var cartItemsContainer = $("#cart-items-container");
                 cartItemsContainer.html(data.cart_items_html);

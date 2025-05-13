@@ -17,6 +17,9 @@ class CartQuerySet(models.QuerySet):
     def total_cars(self):
         return self.count()
 
+    def cars_price(self):
+        return self.car.price_for_sell * self.period
+
 class Cart(models.Model):
 
     user = models.ForeignKey(to=User, on_delete=models.CASCADE, blank=True, null=True, verbose_name='Користувач')
