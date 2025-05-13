@@ -29,6 +29,7 @@ urlpatterns = [
     path('catalog/', include('cars.urls', namespace='catalog')),
     path('users/', include('users.urls', namespace='users')),
     path('carts/', include('carts.urls', namespace='carts')),
+    path('orders/', include('orders.urls', namespace='orders')),
 ] + debug_toolbar_urls()
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
