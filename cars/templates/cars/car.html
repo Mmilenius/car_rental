@@ -44,7 +44,7 @@
                             <p class="card-text">Ціна: <strong>{{ car.price_for_sell }} $</strong></p>
                             <h5 class="card-title">{{ car.name }}</h5>
                             <p class="card-text">{{ car.description }}</p>
-                            <a href="#" class="btn btn-dark add-to-cart">Додати до кошика</a>
+                            <a href="{% url 'carts:carts_add' car.slug%}" class="btn btn-dark add-to-cart">Додати до кошика</a>
                         </div>
                     </div>
                 </div>
