@@ -81,7 +81,9 @@
                                 {%  else %}
                                     <p><strong>{{ car.price }} $</strong></p>
                                 {% endif %}
-                                <a href="{% url 'carts:carts_add' car.slug%}" class="btn add-to-cart">
+                                <a href="{% url 'carts:carts_add' %}" class="btn add-to-cart"
+                                data-car-id="{{ car.id }}">
+                                    {% csrf_token %}
                                     <img class="mx-1" src="{% static 'deps/icons/cart-plus.svg' %}" alt="Іконка кошика"
                                         width="32" height="32">
                                 </a>
