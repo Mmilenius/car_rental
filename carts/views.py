@@ -18,7 +18,11 @@ def carts_add(request, car_slug):
             Cart.objects.create(user=request.user, car=car, period=1)
 
     return redirect(request.META['HTTP_REFERER'])
-def carts_remove(request):
-    ...
+def carts_remove(request, cart_id):
+
+    cart = Cart.objects.get(id=cart_id)
+    cart.delete()
+    return redirect(request.META['HTTP_REFERER'])
+
 def carts_change(request):
     ...
