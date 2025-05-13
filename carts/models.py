@@ -7,12 +7,16 @@ from cars.models import Cars
 
 class CartQuerySet(models.QuerySet):
     def total_price(self):
-        return sum(cart.car_price() for cart in self)
+        return sum(cart.cars_price() for cart in self)
 
     def total_period(self):
         if self:
             return sum(cart.period for cart in self)
         return 0
+
+    def total_cars(self):
+        return self.count()
+
 class Cart(models.Model):
 
     user = models.ForeignKey(to=User, on_delete=models.CASCADE, blank=True, null=True, verbose_name='Користувач')

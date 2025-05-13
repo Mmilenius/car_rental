@@ -1,7 +1,13 @@
 {% extends 'base.html' %}
 {% load static %}
 {% load cars_tags %}
+
+{% block modal_cart %}
+	{% include 'includes/cart_button.html' %}
+{% endblock %}
+
 {% block content %}
+    
 <!-- Контент -->
 <div class="container">
     <div class="row mt-1">
