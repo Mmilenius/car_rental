@@ -1,0 +1,9 @@
+from django.shortcuts import render
+
+# Create your views here.
+def carts_add(request):
+    ...
+def carts_remove(request):
+    ...
+def carts_change(request):
+    ...
