@@ -82,7 +82,7 @@ $(document).ready(function () {
                 }, 7000);
 
                 // Зменшуємо кількість авто у корзині (в шаблоні)
-                cartCount -= data.quantity_deleted;
+                cartCount -= data.period_deleted;
                 carsInCartCount.text(cartCount);
 
                 // Змінюємо вміст корзини на відповідь від django (новий відмальований фрагмент корзини)
