@@ -31,6 +31,7 @@
                                     {% endif %}
                                     <input type="file" class="form-control mt-3" id="id_image"
                                         name="image"
+                                        name="image"
                                         accept="image/*">
                                         {% if form.omage.errors %}
                                             <div class="alert alert-danger alert-dismissible fade show">{{ form.image.errors }}</div>
@@ -90,11 +91,6 @@
                                 {% include 'carts/includes/included_cart.html' %}
                             <!-- Закінчилась розмітка кошика -->
                         </div>
-                        {% if carts%}
-                        <a class="btn btn-dark" href="../orders/create_order.html">
-                            Оформити замовлення
-                        </a>
-                        {% endif %}
                     </div>
                 </div>
                 <!-- Оформлені замовлення -->
@@ -102,72 +98,48 @@
                     <div class="bg-white p-4 mb-4 mx-2 rounded custom-shadow">
                         <h3 class="text-center mb-4">Мої замовлення</h3>
                         <!-- Розмітка замовлень -->
-                        <div class="container">
-                            <div class="accordion" id="accordionExample">
-                                <div class="accordion-item">
-                                    <h2 class="accordion-header" id="heading1">
-                                        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapse1" aria-expanded="false" aria-controls="collapse1">
-                                            Замовлення № 256 — 09 вересня 2023 9:04 | Статус:<strong class="mx-2"> В обробці</strong>
-                                        </button>
-                                    </h2>
-                                    <div id="collapse1" class="accordion-collapse collapse show" aria-labelledby="heading1" data-bs-parent="#accordionExample">
-                                        <div class="accordion-body">
-                                            <table class="table table-dark table-hover">
-                                                <thead>
-                                                    <tr>
-                                                        <th>Товар</th>
-                                                        <th>Кількість</th>
-                                                        <th>Ціна</th>
-                                                        <th>Загальна вартість</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    <tr>
-                                                        <td><a class="text-white" href="#">Комплект стіл і три стільці</a></td>
-                                                        <td>1</td>
-                                                        <td>255.00 $</td>
-                                                        <td>255.00 $</td>
-                                                    </tr>
-                                                </tbody>
-                                            </table>
-                                            <div class="d-flex justify-content-between">
-                                                <p><strong>Разом:</strong></p>
-                                                <p><strong>255.00 $</strong></p>
+                       <div class="col-md-12">
+                        <div class="bg-white p-4 mb-4 mx-2 rounded custom-shadow">
+                            <h3 class="text-center mb-4">Мої замовлення</h3>
+                            <!-- Розмітка замовлень -->
+                            <div class="container">
+                                <div class="accordion" id="accordionExample">
+                                    {% for order in orders %}
+                                    <div class="accordion-item">
+                                        <h2 class="accordion-header" id="heading{{ order.id }}">
+                                            <button class="accordion-button {% if order != orders.0 %}collapsed{% endif %}" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{ order.id }}" aria-expanded="false" aria-controls="collapse{{ order.id }}">
+                                                Замовлення № {{ order.id }} - {{ order.created_timestamp }} | Статус: <strong class="mx-2">{{order.status}}</strong>
+                                            </button>
+                                        </h2>
+                                        <div id="collapse{{ order.id }}" class="accordion-collapse collapse {% if order == orders.0 %}show{% endif %}" aria-labelledby="heading{{ order.id }}" data-bs-parent="#accordionExample">
+                                            <div class="accordion-body">
+                                                <table class="table table-dark table-hover">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>Товар</th>
+                                                            <th>Кількість</th>
+                                                            <th>Ціна</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        {% for item in order.orderitem_set.all %}
+                                                        <tr>
+                                                            <td><a class="text-white" href="{% url 'cars:car' item.car.slug %}">{{ item.car.name }}</a></td>
+                                                            <td>{{ item.period }}</td>
+                                                            <td>{{ item.price }}</td>
+                                                        </tr>
+                                                        {% endfor %}
+                                                    </tbody>
+                                                </table>
                                             </div>
                                         </div>
                                     </div>
-                                </div>
-                                <div class="accordion-item">
-                                    <h2 class="accordion-header" id="heading2">
-                                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse2" aria-expanded="false" aria-controls="collapse2">
-                                            Замовлення № 248 — 01 серпня 2023 11:28 | Статус: <strong>Отримано</strong>
-                                        </button>
-                                    </h2>
-                                    <div id="collapse2" class="accordion-collapse collapse" aria-labelledby="heading2" data-bs-parent="#accordionExample">
-                                        <div class="accordion-body">
-                                            <table class="table table-dark table-hover">
-                                                <thead>
-                                                    <tr>
-                                                        <th>Товар</th>
-                                                        <th>Кількість</th>
-                                                        <th>Ціна</th>
-                                                        <th>Загальна вартість</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    <tr>
-                                                        <td><a class="text-white" href="#">Стілець офісний</a></td>
-                                                        <td>2</td>
-                                                        <td>30.00 $</td>
-                                                        <td>60.00 $</td>
-                                                    </tr>
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                    </div>
+                                    {% endfor %}
                                 </div>
                             </div>
                         </div>
+                    </div>
+
                         <!-- Закінчилась розмітка замовлень -->
                     </div>
                 </div>

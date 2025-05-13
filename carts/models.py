@@ -17,6 +17,7 @@ class CartQuerySet(models.QuerySet):
     def total_cars(self):
         return self.count()
 
+    @property
     def cars_price(self):
         return self.car.price_for_sell * self.period
 

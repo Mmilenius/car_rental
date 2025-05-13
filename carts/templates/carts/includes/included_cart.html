@@ -4,7 +4,7 @@
 <div class="card mb-3 text-bg-light shadow-lg">
     {% for cart in carts %}
         <div class="card-header">
-                                            <h5 class="card-title">{{ cart.product.name }}</h5>
+                                            <h5 class="card-title">{{ cart.car.name }}</h5>
                                         </div>
                                         <ul class="list-group list-group-flush">
                                             <li class="list-group-item">
@@ -53,3 +53,8 @@
                                         </div>
                                     </div>
 
+                                {% if carts and not order%}
+                                	<a class="btn btn-dark" href="{% url 'orders:create_order' %}">
+                                    Оформити замовлення
+                                </a>
+                                {% endif %}
