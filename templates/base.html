@@ -14,9 +14,9 @@
     	
     {% endblock %}
     <!-- Favicons для різних платформ -->
-    <link rel="apple-touch-icon" sizes="180x180" href="{% static "deps/favicon/apple-touch-icon.png" %}">
-    <link rel="icon" type="image/png" sizes="32x32" href="{% static "deps/favicon/favicon-32x32.png" %}">
-    <link rel="icon" type="image/png" sizes="16x16" href="{% static "deps/favicon/favicon-16x16.png" %}">
+    <link rel="apple-touch-icon" sizes="180x180" href="{% static "deps/favicon/rent-a-car-svgr.svg" %}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{% static "deps/favicon/rent-a-car-svgr.svg" %}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{% static "deps/favicon/rent-a-car-svgr.svg" %}">
     <link rel="manifest" href="{% static "deps/favicon/site.webmanifest" %}">
     <title>{{ title }}</title>
 </head>
@@ -39,7 +39,6 @@
                                 Інформація
                             </a>
                             <ul class="dropdown-menu">
-                                <li><a class="dropdown-item text-white" href="#">Доставка та оплата</a></li>
                                 <li><a class="dropdown-item text-white" href="#">Контактна інформація</a></li>
                                 <li><a class="dropdown-item text-white" href="{%  url 'main:about' %}">Про нас</a></li>
                             </ul>
@@ -85,19 +84,7 @@
             <!-- Каталог і кошик з фіксованим розташуванням на сторінці -->
             <div class="row mt-1 position-fixed z-3">
                 <!-- Каталог -->
-                <div class="dropdown mb-2">
-                    <button class="btn btn-secondary dropdown-toggle btn-dark" type="button" data-bs-toggle="dropdown"
-                        aria-expanded="false">
-                        Каталог
-                        <img class="mx-1" src="{% static "deps/icons/grid-fill.svg" %}" alt="Іконка каталогу" width="16"
-                             height="16">
-                    </button>
-                    <ul class="dropdown-menu bg-dark" data-bs-theme="dark">
-                        {% for category in categories %}
-                            <li><a class="dropdown-item text-white" href="{% url 'catalog:index' category.slug %}">{{ category.name }}</a></li>
-                        {% endfor %}
-                    </ul>
-                </div>
+
                 <!-- Значок кошика, викликає модальне вікно -->
                     {% block modal_cart %} {% endblock %}
                 <!-- Завершення розмітки модального вікна -->
