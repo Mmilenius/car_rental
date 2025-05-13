@@ -40,3 +40,5 @@ class Cart(models.Model):
     def __str__(self):
         if self.user:
             return f'Корзина {self.user.username} | Машина {self.car.name} | Період {self.period}'
+
+        return f'Анонімна корзина | Машина {self.car.name} | Період {self.period}'
