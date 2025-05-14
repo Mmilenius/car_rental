@@ -32,8 +32,8 @@ class Order(models.Model):
 
     class Meta:
         db_table = "order"
-        verbose_name = "Замовлення"
-        verbose_name_plural = "Замовлення"
+        verbose_name = "Бронювання"
+        verbose_name_plural = "Бронювання"
         ordering = ("id",)
 
     def __str__(self):

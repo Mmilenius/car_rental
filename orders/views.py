@@ -54,7 +54,7 @@ def create_order(request):
                         # Очистити кошик користувача після створення замовлення
                         cart_items.delete()
 
-                        messages.success(request, 'Замовлення оформлено!')
+                        messages.success(request, 'Бронювання оформлено!')
                         return redirect('users:profile')
             except ValidationError as e:
                 messages.success(request, str(e))
