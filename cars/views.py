@@ -1,7 +1,7 @@
 from django.core.paginator import Paginator
 from django.shortcuts import render, get_object_or_404, get_list_or_404
 
-from cars.models import Cars  # не імпортуй модуль cars, бо це ім’я конфліктує
+from cars.models import Cars
 from cars.utilits import q_search
 
 
@@ -25,7 +25,7 @@ def catalog(request, category_slug=None):
     if order_by and order_by != 'default':
         all_cars = Cars.objects.order_by(order_by)
 
-    paginator = Paginator(all_cars, 4)
+    paginator = Paginator(all_cars, 6)
     current_page = paginator.page(int(page))
 
     context = {

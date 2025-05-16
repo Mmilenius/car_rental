@@ -58,7 +58,7 @@
                                 Мій профіль
                             </a>
                             <ul class="dropdown-menu">
-                                <li><a class="dropdown-item text-white" href="carts/cart.html">Кошик</a></li>
+                                <li><a class="dropdown-item text-white" href="{% url 'users:users_cart' %}">Кошик</a></li>
                                 <li><a class="dropdown-item text-white" href="{% url 'users:profile' %}">Особистий кабінет</a></li>
                                 {% if user.is_admin or  user.is_staff%}
                                 <li><a class="dropdown-item text-white" href="{% url 'admin:index' %}">Адмін панель</a></li>
