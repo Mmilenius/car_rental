@@ -2,24 +2,40 @@ from django.shortcuts import render
 from django.http import HttpResponse
 
 from cars.models import Categories
+from django.views.generic import TemplateView
+
+
 # Create your views here.
-def index(request):
 
-    categories = Categories.objects.all()
+class IndexView(TemplateView):
+    template_name = 'main/index.html'
 
-    context = {
-        'title': 'Home - Головна',
-        'content': 'Прокат автомобілів',
-        'categories': categories
-    }
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = 'Home - Головна'
+        context['content'] = "Прокат автомобілі"
+        context['categories'] = Categories.objects.all()
+        return context
 
-    return render(request, 'main/index.html', context)
 
-def about(request):
-    context = {
-        'title': 'Home - Про сайт',
-        'content': 'Про сайт',
-        'text_on_page': 'Текст на сторінці',
-    }
+class AboutView(TemplateView):
+    template_name = 'main/about.html'
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = 'Home - Про сайт'
+        context['content'] = "Про сайт"
+        context['text_on_page'] = 'Текст на сторінці'
+        return context
 
-    return render(request, 'main/about.html', context)
+
+#def index(request):
+
+    #categories = Categories.objects.all()
+
+    #context = {
+        #   'title': 'Home - Головна',
+        #   'content': 'Прокат автомобілів',
+    #  'categories': categories
+    #}
+
+    #return render(request, 'main/index.html', context)

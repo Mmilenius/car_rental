@@ -1,105 +1,104 @@
 from django.contrib import auth, messages
 from django.contrib.auth.decorators import login_required
 from django.db.models import Prefetch
-from django.http import HttpResponseRedirect
+from django.utils.decorators import method_decorator
 from django.shortcuts import render, redirect
 from django.urls import reverse
-
+from django.views import View
+from django.views.generic import FormView, TemplateView
 from carts.models import Cart
 from orders.models import Order, OrderItem
 from users.forms import UserLoginForm, UserRegistationForm, ProfileForm
 
 
-# Create your views here.
+class UserLoginView(FormView):
+    template_name = 'users/login.html'
+    form_class = UserLoginForm
 
-def login(request):
-    if request.method == 'POST':
-        form = UserLoginForm(data=request.POST)
-        if form.is_valid():
-            username = request.POST['username']
-            password = request.POST['password']
-            user = auth.authenticate(username=username, password=password)
+    def form_valid(self, form):
+        username = form.cleaned_data['username']
+        password = form.cleaned_data['password']
+        user = auth.authenticate(username=username, password=password)
+        session_key = self.request.session.session_key
 
-            session_key = request.session.session_key
-
-            if user:
-                auth.login(request, user)
-                messages.success(request, f'{username}, Ви ввішли в аккаунт')
-
-                if session_key:
-                    Cart.objects.filter(session_key=session_key).update(user=user)
-
-                if request.POST.get('next', None):
-                    return HttpResponseRedirect(request.POST.get('next'))
-
-                return HttpResponseRedirect(reverse('main:index'))
-    else:
-        form = UserLoginForm()
-    contex = {
-        'title': 'Home - Авторизація',
-        'form': form,
-    }
-    return render(request, 'users/login.html', contex)
-
-def registration(request):
-
-    if request.method == 'POST':
-        form = UserRegistationForm(data=request.POST)
-        if form.is_valid():
-            form.save()
-
-            session_key = request.session.session_key
-
-            user = form.instance
-            auth.login(request, user)
+        if user:
+            auth.login(self.request, user)
+            messages.success(self.request, f'{username}, Ви ввійшли в аккаунт')
 
             if session_key:
                 Cart.objects.filter(session_key=session_key).update(user=user)
 
-            messages.success(request, f'{user:username}, Ви успішно в аккаунт')
-            return HttpResponseRedirect(reverse('main:index'))
-    else:
-        form = UserRegistationForm()
+            next_url = self.request.POST.get('next')
+            if next_url:
+                return redirect(next_url)
+            return redirect(reverse('main:index'))
+        else:
+            messages.error(self.request, 'Невірний логін або пароль')
+            return self.form_invalid(form)
 
-    contex = {
-        'title': 'Home - Реєстрація',
-        'form': form,
-    }
-    return render(request, 'users/registration.html', contex)
 
-@login_required
-def profile(request):
+class UserRegistrationView(FormView):
+    template_name = 'users/registration.html'
+    form_class = UserRegistationForm
 
-    if request.method == 'POST':
+    def form_valid(self, form):
+        user = form.save()
+        auth.login(self.request, user)
+        session_key = self.request.session.session_key
+
+        if session_key:
+            Cart.objects.filter(session_key=session_key).update(user=user)
+
+        messages.success(self.request, f'{user.username}, Ви успішно ввійшли в аккаунт')
+        return redirect(reverse('main:index'))
+
+
+@method_decorator(login_required, name='dispatch')
+class ProfileView(View):
+    template_name = 'users/profile.html'
+
+    def get(self, request):
+        form = ProfileForm(instance=request.user)
+        orders = Order.objects.filter(user=request.user).prefetch_related(
+            "orderitem_set__car"
+        ).order_by("-id")
+
+        context = {
+            'title': 'Home - Профіль',
+            'form': form,
+            'orders': orders,
+        }
+        return render(request, self.template_name, context)
+
+    def post(self, request):
         form = ProfileForm(data=request.POST, instance=request.user, files=request.FILES)
         if form.is_valid():
             form.save()
             messages.success(request, 'Профіль успішно оновлений')
-            return HttpResponseRedirect(reverse('users:profile'))
-    else:
-        form = ProfileForm(instance=request.user)
+            return redirect(reverse('users:profile'))
 
-    orders = Order.objects.filter(user=request.user).prefetch_related(
-                         Prefetch(
-                             "orderitem_set",
-                             queryset=OrderItem.objects.select_related("car"),
-                         )
-                     ).order_by("-id")
+        orders = Order.objects.filter(user=self.request.user).prefetch_related(
+                Prefetch(
+                    "orderitem_set",
+                    queryset=OrderItem.objects.select_related("car"),
+                )
+            ).order_by("-id")
 
-    contex = {
-        'title': 'Home - Профіль',
-        'form': form,
-        'orders': orders,
-    }
-    return render(request, 'users/profile.html', contex)
+        context = {
+            'title': 'Home - Профіль',
+            'form': form,
+            'orders': orders,
+        }
+        return render(request, self.template_name, context)
 
 
-def users_cart(request):
-    return render(request, 'users/users_cart.html')
+class UsersCartView(TemplateView):
+    template_name = 'users/users_cart.html'
 
-@login_required
-def logout(request):
-    messages.success(request, f'{request.user.username}, Ви вийшли з аккаунта')
-    auth.logout(request)
-    return redirect(reverse('main:index'))
 
+@method_decorator(login_required, name='dispatch')
+class UserLogoutView(View):
+    def get(self, request):
+        messages.success(request, f'{request.user.username}, Ви вийшли з аккаунта')
+        auth.logout(request)
+        return redirect(reverse('main:index'))
