@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load cache %}
 {% load carts_tags %}
 
 
@@ -94,7 +95,7 @@
                     </div>
                 </div>
                 <!-- Оформлені замовлення -->
-
+                        {% comment %} {% cache 60 user_orders user.id %} {% endcomment %}
                         <!-- Розмітка замовлень -->
                        <div class="col-md-12">
                         <div class="bg-white p-4 mb-4 mx-2 rounded custom-shadow">
@@ -134,7 +135,7 @@
                                     </div>
                                     {% endfor %}
                                 </div>
-
+                            {% comment %} {% endcache %} {% endcomment %}
                     </div>
 
                         <!-- Закінчилась розмітка замовлень -->

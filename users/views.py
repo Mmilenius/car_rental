@@ -9,6 +9,7 @@ from django.views.generic import FormView, TemplateView
 from carts.models import Cart
 from orders.models import Order, OrderItem
 from users.forms import UserLoginForm, UserRegistationForm, ProfileForm
+from common.mixins import CacheMixin
 
 
 class UserLoginView(FormView):
@@ -54,14 +55,26 @@ class UserRegistrationView(FormView):
 
 
 @method_decorator(login_required, name='dispatch')
-class ProfileView(View):
+class ProfileView(View, CacheMixin):
     template_name = 'users/profile.html'
 
     def get(self, request):
         form = ProfileForm(instance=request.user)
+
+        # формуємо queryset
         orders = Order.objects.filter(user=request.user).prefetch_related(
-            "orderitem_set__car"
+            Prefetch(
+                "orderitem_set",
+                queryset=OrderItem.objects.select_related("car"),
+            )
         ).order_by("-id")
+
+        # підставляємо в кеш
+        orders = self.set_get_cache(
+            query=orders,
+            cache_name=f"user_{request.user.id}_orders",
+            cache_time=60 * 5
+        )
 
         context = {
             'title': 'Home - Профіль',
@@ -75,14 +88,26 @@ class ProfileView(View):
         if form.is_valid():
             form.save()
             messages.success(request, 'Профіль успішно оновлений')
+
+            # очищаємо кеш після оновлення профілю
+            cache.delete(f"user_{request.user.id}_orders")
+
             return redirect(reverse('users:profile'))
 
-        orders = Order.objects.filter(user=self.request.user).prefetch_related(
-                Prefetch(
-                    "orderitem_set",
-                    queryset=OrderItem.objects.select_related("car"),
-                )
-            ).order_by("-id")
+        # знову формуємо queryset
+        orders = Order.objects.filter(user=request.user).prefetch_related(
+            Prefetch(
+                "orderitem_set",
+                queryset=OrderItem.objects.select_related("car"),
+            )
+        ).order_by("-id")
+
+        # і підставляємо в кеш
+        orders = self.set_get_cache(
+            query=orders,
+            cache_name=f"user_{request.user.id}_orders",
+            cache_time=60 * 5
+        )
 
         context = {
             'title': 'Home - Профіль',
