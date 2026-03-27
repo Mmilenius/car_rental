@@ -3,146 +3,155 @@
 {% load cache %}
 {% load carts_tags %}
 
-
 {% block content %}
-    {% user_carts request as carts %}
-	<!-- Контент на сторінці -->
-    <div class="row">
-        <div class="container mt-5">
-            <div class="row">
-                <!-- Профіль з даними користувача -->
-                <div class="col-md-5">
-                    <div class="bg-white p-4 mb-4 mx-2 rounded custom-shadow">
-                        <h3 class="text-center mb-4">Профіль користувача</h3>
-                        <form action='{% url 'users:profile' %}' method = 'post' enctype="multipart/form-data">
-                            {% csrf_token %}
-                            {% if form.non_field_errors %}
-                            	<p>{{ form.non_field_errors }}</p>
-                            {% endif %} 
-                            <div class="row">
-                                <div class="col-md-12 mb-3 text-center">
-                                    {% if user.image %}
-                                    	<img src="{{user.image.url}}"
-                                        alt="Аватар користувача" class="img-fluid rounded-circle"
-                                        style="max-width: 150px;">
-                                    {% else %}
-                                        <img src="{% static 'deps/images/baseavatar.jpg' %}"
-                                        alt="Аватар користувача" class="img-fluid rounded-circle"
-                                        style="max-width: 150px;">
-                                    {% endif %}
-                                    <input type="file" class="form-control mt-3" id="id_image"
-                                        name="image"
-                                        name="image"
-                                        accept="image/*">
-                                        {% if form.omage.errors %}
-                                            <div class="alert alert-danger alert-dismissible fade show">{{ form.image.errors }}</div>
-                                        {% endif %}
-                                </div>
-                                <div class="col-md-12 mb-3">
-                                    <label for="id_first_Name" class="form-label">Ім’я*</label>
-                                    <input type="text" class="form-control" id="id_first_Name"
-                                        name="first_name"
-                                        placeholder="Введіть ваше ім’я"
-                                        value="{{ form.first_name.value }}" required>
-                                        {% if form.first_name.errors %}
-                                            <div class="alert alert-danger alert-dismissible fade show">{{ form.first_name.errors }}</div>
-                                        {% endif %}
-                                </div>
-                                <div class="col-md-12 mb-3">
-                                    <label for="id_last_Name" class="form-label">Прізвище*</label>
-                                    <input type="text" class="form-control" id="id_last_Name"
-                                        placeholder="Введіть ваше прізвище"
-                                        name="last_name"
-                                        value="{{ form.last_name.value }}" required>
-                                        {% if form.last_name.errors %}
-                                               <div class="alert alert-danger alert-dismissible fade show">{{ form.last_name.errors }}</div>
-                                        {% endif %}
-                                </div>
-                                <div class="col-md-12 mb-3">
-                                    <label for="id_username" class="form-label">Ім’я користувача*</label>
-                                    <input type="text" class="form-control" id="id_username"
-                                        placeholder="Введіть ваше ім’я користувача"
-                                        name="username"
-                                        value="{{ form.username.value }}" required>
-                                        {% if form.username.errors %}
-                                            <div class="alert alert-danger alert-dismissible fade show">{{ form.username.errors }}</div>
-                                        {% endif %}
-                                </div>
-                                <div class="col-md-12 mb-3">
-                                    <label for="id_email" class="form-label">Email*</label>
-                                    <input type="email" class="form-control" id="id_email"
-                                        placeholder="Введіть ваш email *youremail@example.com" #
-                                        name="email"
-                                        value="{{ form.email.value }}" required>
-                                        {% if form.email.errors %}
-                                            <div class="alert alert-danger alert-dismissible fade show">{{ form.email.errors }}</div>
-                                        {% endif %}
-                                </div>
-                            </div>
-                            <button type="submit" class="btn btn-dark">Зберегти</button>
-                        </form>
+{% user_carts request as carts %}
+<div class="max-w-7xl mx-auto py-10 px-4">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+
+        <div class="lg:col-span-5 space-y-8">
+            <div class="bg-white rounded-3xl shadow-xl border border-zinc-100 p-8">
+                <h3 class="text-2xl font-black text-zinc-900 mb-6 text-center">Профіль користувача</h3>
+
+                <form action="{% url 'users:profile' %}" method="post" enctype="multipart/form-data" class="space-y-5">
+                    {% csrf_token %}
+
+                    <div class="flex flex-col items-center mb-6">
+                        <div class="w-32 h-32 rounded-full overflow-hidden border-4 border-zinc-100 shadow-sm mb-4 relative group">
+                            {% if user.image %}
+                                <img src="{{ user.image.url }}" alt="Avatar" class="w-full h-full object-cover">
+                            {% else %}
+                                <img src="{% static 'deps/images/baseavatar.jpg' %}" alt="Avatar" class="w-full h-full object-cover">
+                            {% endif %}
+
+                            <label for="id_image" class="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition cursor-pointer text-white text-xs font-bold">
+                                Змінити
+                            </label>
+                        </div>
+                        <input type="file" name="image" id="id_image" accept="image/*" class="hidden">
+                        {% if form.image.errors %}<div class="text-red-500 text-xs">{{ form.image.errors }}</div>{% endif %}
                     </div>
-                </div>
-                <!-- Кошик -->
-                <div class="col-md-7">
-                    <div class="bg-white p-4 mb-4 mx-2 rounded custom-shadow">
-                        <h3 class="text-center mb-4">Кошик</h3>
-                        <div class="container" id="cart-items-container">
-                            <!-- Розмітка кошика -->
-                                {% include 'carts/includes/included_cart.html' %}
-                            <!-- Закінчилась розмітка кошика -->
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label for="id_first_name" class="block text-xs font-bold text-zinc-500 uppercase mb-1">Ім’я</label>
+                            <input type="text" name="first_name" id="id_first_name" value="{{ form.first_name.value }}" required
+                                   class="w-full bg-zinc-50 border border-zinc-200 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none transition">
+                        </div>
+                        <div>
+                            <label for="id_last_name" class="block text-xs font-bold text-zinc-500 uppercase mb-1">Прізвище</label>
+                            <input type="text" name="last_name" id="id_last_name" value="{{ form.last_name.value }}" required
+                                   class="w-full bg-zinc-50 border border-zinc-200 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none transition">
                         </div>
                     </div>
-                </div>
-                <!-- Оформлені замовлення -->
-                        {% comment %} {% cache 60 user_orders user.id %} {% endcomment %}
-                        <!-- Розмітка замовлень -->
-                       <div class="col-md-12">
-                        <div class="bg-white p-4 mb-4 mx-2 rounded custom-shadow">
-                            <h3 class="text-center mb-4">Мої замовлення</h3>
-                            <!-- Розмітка замовлень -->
-                            <div class="container">
-                                <div class="accordion" id="accordionExample">
-                                    {% for order in orders %}
-                                    <div class="accordion-item">
-                                        <h2 class="accordion-header" id="heading{{ order.id }}">
-                                            <button class="accordion-button {% if order != orders.0 %}collapsed{% endif %}" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{ order.id }}" aria-expanded="false" aria-controls="collapse{{ order.id }}">
-                                                Замовлення № {{ order.id }} - {{ order.created_timestamp }} | Статус: <strong class="mx-2">{{order.status}}</strong>
-                                            </button>
-                                        </h2>
-                                        <div id="collapse{{ order.id }}" class="accordion-collapse collapse {% if order == orders.0 %}show{% endif %}" aria-labelledby="heading{{ order.id }}" data-bs-parent="#accordionExample">
-                                            <div class="accordion-body">
-                                                <table class="table table-dark table-hover">
-                                                    <thead>
-                                                        <tr>
-                                                            <th>Товар</th>
-                                                            <th>Кількість</th>
-                                                            <th>Ціна</th>
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody>
-                                                        {% for item in order.orderitem_set.all %}
-                                                        <tr>
-                                                            <td><a class="text-white" href="{% url 'cars:car' item.car.slug %}">{{ item.car.name }}</a></td>
-                                                            <td>{{ item.period }}</td>
-                                                            <td>{{ item.price }}</td>
-                                                        </tr>
-                                                        {% endfor %}
-                                                    </tbody>
-                                                </table>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    {% endfor %}
-                                </div>
-                            {% comment %} {% endcache %} {% endcomment %}
+
+                    <div>
+                        <label for="id_username" class="block text-xs font-bold text-zinc-500 uppercase mb-1">Логін</label>
+                        <input type="text" name="username" id="id_username" value="{{ form.username.value }}" required
+                               class="w-full bg-zinc-50 border border-zinc-200 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none transition">
                     </div>
 
-                        <!-- Закінчилась розмітка замовлень -->
+                    <div>
+                        <label for="id_email" class="block text-xs font-bold text-zinc-500 uppercase mb-1">Email</label>
+                        <input type="email" name="email" id="id_email" value="{{ form.email.value }}" required
+                               class="w-full bg-zinc-50 border border-zinc-200 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none transition">
                     </div>
+
+                    <button type="submit" class="w-full bg-zinc-900 text-white font-bold py-3 rounded-xl hover:bg-zinc-800 transition shadow-lg">
+                        Зберегти зміни
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <div class="lg:col-span-7 space-y-8">
+
+            <div class="bg-white rounded-3xl shadow-sm border border-zinc-100 overflow-hidden">
+                <div class="bg-zinc-50 px-6 py-4 border-b border-zinc-100">
+                    <h3 class="font-bold text-zinc-900 flex items-center gap-2">
+                        <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+                        Ваш кошик
+                    </h3>
+                </div>
+                <div class="p-0">
+                    {% include 'carts/includes/included_cart.html' %}
+                </div>
+            </div>
+
+            <div class="bg-white rounded-3xl shadow-sm border border-zinc-100 overflow-hidden">
+                <div class="bg-zinc-900 text-white px-6 py-8 text-center">
+                    <h3 class="text-2xl font-bold mb-1">Мої замовлення</h3>
+                    <p class="text-zinc-400 text-sm">Історія та статус бронювань</p>
+                </div>
+
+                <div class="p-6 space-y-4">
+                    {% for order in orders %}
+                    <details class="group bg-zinc-50 rounded-2xl border border-zinc-200 overflow-hidden transition-all duration-300 [&[open]]:bg-white [&[open]]:shadow-md" {% if forloop.first %}open{% endif %}>
+                        <summary class="flex items-center justify-between px-6 py-4 cursor-pointer select-none list-none">
+                            <div class="flex flex-col md:flex-row md:items-center gap-2 md:gap-6">
+                                <div>
+                                    <span class="block text-xs text-zinc-400 font-bold uppercase">Замовлення</span>
+                                    <span class="font-bold text-zinc-900">#{{ order.id }}</span>
+                                </div>
+                                <div class="hidden md:block w-px h-8 bg-zinc-200"></div>
+                                <div>
+                                    <span class="block text-xs text-zinc-400 font-bold uppercase">Дата</span>
+                                    <span class="text-sm text-zinc-700">{{ order.created_timestamp|date:"d.m.Y" }}</span>
+                                </div>
+                            </div>
+
+                            <div class="flex items-center gap-4">
+                                {% if order.status == 'Опрацьовується' %}
+                                    <span class="px-3 py-1 bg-yellow-100 text-yellow-800 rounded-full text-xs font-bold border border-yellow-200">{{ order.status }}</span>
+                                {% elif order.status == 'Підтверджено' %}
+                                    <span class="px-3 py-1 bg-green-100 text-green-800 rounded-full text-xs font-bold border border-green-200">{{ order.status }}</span>
+                                {% elif order.status == 'Виконано' %}
+                                    <span class="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-xs font-bold border border-blue-200">{{ order.status }}</span>
+                                {% else %}
+                                    <span class="px-3 py-1 bg-gray-100 text-gray-800 rounded-full text-xs font-bold border border-gray-200">{{ order.status }}</span>
+                                {% endif %}
+
+                                <svg class="w-5 h-5 text-zinc-400 transform group-open:rotate-180 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                            </div>
+                        </summary>
+
+                        <div class="border-t border-zinc-100 px-6 py-4">
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-left">
+                                    <thead>
+                                        <tr class="text-xs text-zinc-400 uppercase border-b border-zinc-200">
+                                            <th class="pb-2">Автомобіль</th>
+                                            <th class="pb-2 text-center">Термін</th>
+                                            <th class="pb-2 text-center">Ціна/день</th>
+                                            <th class="pb-2 text-right">Сума</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="text-sm">
+                                        {% for item in order.orderitem_set.all %}
+                                        <tr class="border-b border-zinc-50 last:border-0">
+                                            <td class="py-3 font-medium text-zinc-900">
+                                                <a href="{% url 'catalog:car' item.car.slug %}" class="hover:text-blue-600 transition">{{ item.car.name }}</a>
+                                            </td>
+                                            <td class="py-3 text-center text-zinc-500">{{ item.period }} дн.</td>
+                                            <td class="py-3 text-center font-bold text-zinc-700">${{ item.price }}</td>
+                                            <td class="py-3 text-right font-black text-zinc-900">${{ item.total_price }}</td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </details>
+                    {% empty %}
+                    <div class="text-center py-10 bg-zinc-50 rounded-2xl border border-dashed border-zinc-300">
+                        <svg class="w-12 h-12 text-zinc-300 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+                        <h4 class="text-zinc-900 font-bold">Історія порожня</h4>
+                        <p class="text-zinc-500 text-sm mb-4">Ви ще не робили замовлень</p>
+                        <a href="{% url 'main:index' %}" class="inline-block bg-zinc-900 text-white px-6 py-2 rounded-full text-sm font-bold hover:bg-zinc-800 transition">До каталогу</a>
+                    </div>
+                    {% endfor %}
                 </div>
             </div>
         </div>
     </div>
-
+</div>
 {% endblock %}

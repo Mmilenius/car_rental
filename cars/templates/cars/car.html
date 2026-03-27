@@ -1,62 +1,245 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load users_tags %}
 
 {% block modal_cart %}
-	{% include 'includes/cart_button.html' %}
+    {% include 'includes/cart_button.html' %}
 {% endblock %}
 
-
 {% block content %}
-	<!-- Контент -->
-    <div class="container">
-        <div class="row mt-1">
-            <div class="col-lg-2">
-                <!-- Порожній блок на ваш розсуд -->
+<div class="py-10 max-w-[1440px] mx-auto px-4 md:px-8">
+
+    <nav class="text-sm text-gray-500 mb-6">
+        <a href="{% url 'main:index' %}" class="hover:text-blue-600 transition">Головна</a>
+        <span class="mx-2">/</span>
+        <a href="{% url 'catalog:index' 'all' %}" class="hover:text-blue-600 transition">Каталог</a>
+        <span class="mx-2">/</span>
+        <span class="text-zinc-900 font-bold">{{ car.name }}</span>
+    </nav>
+
+    <div class="bg-white rounded-3xl overflow-hidden shadow-2xl border border-zinc-100 mb-10">
+        <div class="flex flex-col lg:flex-row">
+
+            <div class="lg:w-1/2 relative group overflow-hidden bg-zinc-100 min-h-[400px] flex items-center justify-center">
+                {% if car.image %}
+                    <img src="{{ car.image.url }}" class="w-full h-full object-cover transition duration-700 group-hover:scale-105 cursor-zoom-in"
+                         alt="{{ car.name }}" onclick="document.getElementById('imageModal').classList.remove('hidden')">
+                {% else %}
+                    <span class="text-6xl">🚙</span>
+                {% endif %}
+
+                {% if car.discount %}
+                    <div class="absolute top-6 left-0 bg-red-600 text-white font-black px-6 py-2 rounded-r-full shadow-lg text-lg z-10">
+                        -{{ car.discount|floatformat:0 }}%
+                    </div>
+                {% endif %}
+
+                <button class="absolute top-4 right-4 p-3 bg-white/80 backdrop-blur rounded-full shadow-lg hover:bg-white transition add-to-favorites group/btn z-20"
+                        data-car-id="{{ car.id }}"
+                        data-url="{% url 'users:toggle_favorite' %}">
+                    {% is_in_favorites car.id as is_fav %}
+                    <svg class="w-6 h-6 transition-colors {% if is_fav %}text-red-500 fill-current{% else %}text-gray-400 group-hover/btn:text-red-500{% endif %}"
+                         fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
+                    </svg>
+                </button>
             </div>
-            <div class="col-lg-10">
-                <!-- Контент на сторінці -->
-                <div class="container mt-5">
-                    <div class="card mb-4 custom-shadow">
-                        <div class="row">
-                            <!-- Мініатюри -->
-                            <div class="col-md-4">
-                                <img src="{{ car.image.url }}"
-                                     class="img-thumbnail" data-bs-toggle="modal" data-bs-target="#imageModal1">
-                            </div>
-                            <div class="col-md-4 ">
-                                <p class="product_id mt-3">id: {{ car.displey_id}}</p>
-                            </div>
-                            <!-- Збільшити зображення в модальному вікні -->
-                            <div class="modal fade" id="imageModal1" tabindex="-1"
-                                 aria-labelledby="imageModal1Label" aria-hidden="true">
-                                <div class="modal-dialog modal-lg">
-                                    <div class="modal-content">
-                                        <div class="modal-header">
-                                            <h5 class="modal-title" id="imageModal1Label">{{ car.name }}</h5>
-                                            <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                                    aria-label="Закрити"></button>
-                                        </div>
-                                        <div class="modal-body">
-                                            <img src="{{ car.image.url }}"
-                                                 class="img-fluid" alt="{{ car.name }}">
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+
+            <div class="lg:w-1/2 p-8 lg:p-12 flex flex-col">
+                <div class="mb-8">
+                    <h1 class="text-4xl font-black text-zinc-900 mb-4 tracking-tight uppercase">{{ car.name }}</h1>
+
+                    <div class="inline-flex items-center gap-4 bg-zinc-50 p-4 rounded-2xl border border-zinc-100">
+                        {% if car.discount %}
+                            <span class="text-zinc-400 line-through text-lg">${{ car.price }}</span>
+                            <span class="text-3xl font-black text-green-600">${{ car.price_for_sell }}</span>
+                        {% else %}
+                            <span class="text-3xl font-black text-green-600">${{ car.price }}</span>
+                        {% endif %}
+                        <span class="text-zinc-500 font-medium">/ добу</span>
+                    </div>
+                </div>
+
+                <div class="bg-zinc-900 rounded-2xl p-6 text-white mb-8 shadow-inner">
+                    <div class="flex justify-between items-center mb-4 border-b border-zinc-800 pb-2">
+                        <span class="text-sm font-bold uppercase text-zinc-400 tracking-widest">Гнучкі тарифи</span>
+                        <span class="text-xs bg-blue-600 px-2 py-1 rounded text-white uppercase">Вигідно</span>
+                    </div>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+                        <div class="space-y-1">
+                            <div class="text-[10px] text-zinc-500 uppercase">1-3 дні</div>
+                            <div class="text-lg font-bold">${{ car.price_for_sell }}</div>
                         </div>
-                        <!-- Опис товару -->
-                        <div class="card-body">
-                            <p class="card-text">Ціна: <strong>{{ car.price_for_sell }} $</strong></p>
-                            <h5 class="card-title">{{ car.name }}</h5>
-                            <p class="card-text">{{ car.description }}</p>
-                            <a href="{% url 'carts:carts_add' %}" class="btn btn-dark add-to-cart"
-                            data-car-id="{{ car.id }}">
-                                {% csrf_token %}
-                                Додати до кошика</a>
+                        <div class="space-y-1 border-l border-zinc-800">
+                            <div class="text-[10px] text-zinc-500 uppercase">4-7 днів</div>
+                            <div class="text-lg font-bold text-green-400">${{ car.price_for_sell|add:"-2" }}</div>
+                        </div>
+                        <div class="space-y-1 border-l border-zinc-800">
+                            <div class="text-[10px] text-zinc-500 uppercase">8-15 днів</div>
+                            <div class="text-lg font-bold text-green-400">${{ car.price_for_sell|add:"-5" }}</div>
+                        </div>
+                        <div class="space-y-1 border-l border-zinc-800">
+                            <div class="text-[10px] text-zinc-500 uppercase">16+ днів</div>
+                            <div class="text-lg font-bold text-green-400">${{ car.price_for_sell|add:"-8" }}</div>
+                        </div>
+                    </div>
+                    <div class="mt-6 text-center border-t border-zinc-800 pt-4">
+                        <span class="text-orange-400 font-bold uppercase tracking-widest text-sm">Депозит: ${{ car.deposit }}</span>
+                    </div>
+                </div>
+
+                <div class="space-y-4 mt-auto">
+                    <a href="{% url 'carts:carts_add' %}"
+                       class="add-to-cart block w-full text-center bg-blue-600 hover:bg-blue-700 text-white text-xl font-bold py-5 rounded-2xl transition duration-300 shadow-xl shadow-blue-100 flex items-center justify-center gap-3"
+                       data-car-id="{{ car.id }}">
+                        {% csrf_token %}
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+                        Забронювати зараз
+                    </a>
+
+                    <div class="bg-blue-50 border border-blue-100 p-4 rounded-2xl flex gap-3 items-center">
+                        <svg class="w-6 h-6 text-blue-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        <div class="text-xs text-blue-800 leading-relaxed">
+                            Водій від <strong>{{ car.min_age }} років</strong> зі стажем від <strong>{{ car.min_experience }} рік</strong>.
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-10">
+        <div class="lg:col-span-7 space-y-6">
+            <h3 class="text-2xl font-bold text-zinc-900 flex items-center gap-2">
+                <span class="w-8 h-1 bg-blue-600 rounded-full"></span>
+                Про цей автомобіль
+            </h3>
+            <div class="prose prose-zinc max-w-none text-zinc-600 leading-relaxed text-justify">
+                {% if car.description %}
+                    {{ car.description|linebreaks }}
+                {% else %}
+                    <p>{{ car.name }} — надійне рішення для ваших поїздок. Кожен кілометр з цим авто принесе вам задоволення від керування та комфорту.</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="lg:col-span-5">
+            <div class="bg-zinc-50 rounded-3xl p-8 border border-zinc-100 h-full">
+                <h3 class="text-xl font-bold text-zinc-900 mb-6 uppercase tracking-wider">Характеристики</h3>
+                <dl class="space-y-4 text-sm">
+                    <div class="flex justify-between border-b border-zinc-200 pb-2">
+                        <dt class="text-zinc-500">Двигун</dt>
+                        <dd class="font-bold text-zinc-900">{{ car.engine_volume|default:"—" }} л.</dd>
+                    </div>
+                    <div class="flex justify-between border-b border-zinc-200 pb-2">
+                        <dt class="text-zinc-500">Витрата палива</dt>
+                        <dd class="font-bold text-zinc-900">{{ car.fuel_consumption|default:"—" }}</dd>
+                    </div>
+                    <div class="flex justify-between border-b border-zinc-200 pb-2">
+                        <dt class="text-zinc-500">Трансмісія</dt>
+                        <dd class="font-bold text-zinc-900">{{ car.get_transmission_display_ua|title }}</dd>
+                    </div>
+                    <div class="flex justify-between border-b border-zinc-200 pb-2">
+                        <dt class="text-zinc-500">Тип палива</dt>
+                        <dd class="font-bold text-zinc-900">{{ car.get_fuel_type_display_ua|title }}</dd>
+                    </div>
+                    <div class="flex justify-between border-b border-zinc-200 pb-2">
+                        <dt class="text-zinc-500">Кондиціонер</dt>
+                        <dd class="font-bold text-zinc-900">{% if car.has_air_conditioning %}Є{% else %}Відсутній{% endif %}</dd>
+                    </div>
+                    <div class="flex justify-between border-b border-zinc-200 pb-2">
+                        <dt class="text-zinc-500">Кількість місць</dt>
+                        <dd class="font-bold text-zinc-900">{{ car.seats }}</dd>
+                    </div>
+                    <div class="flex justify-between">
+                        <dt class="text-zinc-500">Двері</dt>
+                        <dd class="font-bold text-zinc-900">{{ car.doors }}</dd>
+                    </div>
+                </dl>
+            </div>
+        </div>
+    </div>
+
+    {% if similar_cars %}
+    <div class="mt-20 border-t border-gray-100 pt-10">
+        <h3 class="text-2xl font-black text-zinc-900 mb-8">Також вас можуть зацікавити</h3>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {% for item in similar_cars %}
+            <div class="bg-white rounded-xl p-4 shadow-sm border border-gray-100 hover:shadow-lg transition duration-300 group flex flex-col h-full relative">
+
+                <button class="absolute top-3 right-3 z-10 p-2 bg-white/80 backdrop-blur rounded-full shadow-sm hover:bg-white transition add-to-favorites group/btn"
+                        data-car-id="{{ item.id }}"
+                        data-url="{% url 'users:toggle_favorite' %}">
+                    {% is_in_favorites item.id as is_fav %}
+                    <svg class="w-5 h-5 transition-colors {% if is_fav %}text-red-500 fill-current{% else %}text-gray-300 group-hover/btn:text-red-500{% endif %}"
+                         fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
+                    </svg>
+                </button>
+
+                <a href="{% url 'catalog:car' item.slug %}" class="block relative h-40 bg-gray-50 rounded-lg overflow-hidden mb-4 flex items-center justify-center">
+                    {% if item.image %}
+                        <img src="{{ item.image.url }}" alt="{{ item.name }}" class="w-full h-full object-cover transform group-hover:scale-105 transition duration-500">
+                    {% else %}
+                        <span class="text-3xl">🚙</span>
+                    {% endif %}
+
+                    {% if item.discount %}
+                        <span class="absolute bottom-2 left-2 bg-yellow-400 text-zinc-900 text-[10px] font-bold px-2 py-1 rounded">-{{ item.discount|floatformat:0 }}%</span>
+                    {% endif %}
+                </a>
+
+                <div class="flex-grow flex flex-col">
+                    <a href="{% url 'catalog:car' item.slug %}" class="font-bold text-zinc-900 mb-1 hover:text-blue-600 transition line-clamp-1" title="{{ item.name }}">
+                        {{ item.name }}
+                    </a>
+
+                    <div class="text-xs text-gray-400 mb-4 flex items-center gap-2">
+                        <span>{{ item.get_transmission_display_ua }}</span>
+                        <span class="w-1 h-1 bg-gray-300 rounded-full"></span>
+                        <span>{{ item.get_fuel_type_display_ua }}</span>
+                    </div>
+
+                    <div class="mt-auto flex justify-between items-end">
+                        <div>
+                            {% if item.discount %}
+                                <span class="text-xs text-gray-400 line-through">${{ item.price }}</span>
+                                <div class="font-black text-xl text-red-500 leading-none">
+                                    ${{ item.price_for_sell }}<span class="text-xs font-normal text-zinc-400">/д</span>
+                                </div>
+                            {% else %}
+                                <div class="font-black text-xl text-zinc-900 leading-none">
+                                    ${{ item.price }}<span class="text-xs font-normal text-zinc-400">/д</span>
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <a href="{% url 'carts:carts_add' %}"
+                           class="add-to-cart w-10 h-10 rounded-lg bg-green-500 text-white flex items-center justify-center hover:bg-green-600 transition shadow-lg shadow-green-200"
+                           data-car-id="{{ item.id }}">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+</div>
+
+<div id="imageModal" class="fixed inset-0 z-[100] hidden bg-black/90 flex items-center justify-center p-4 backdrop-blur-sm transition-opacity" onclick="this.classList.add('hidden')">
+    <button class="absolute top-6 right-6 text-white text-4xl hover:text-gray-300">&times;</button>
+    {% if car.image %}
+        <img src="{{ car.image.url }}" class="max-w-full max-h-full rounded-lg shadow-2xl" alt="{{ car.name }}" onclick="event.stopPropagation()">
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block footer %}
+<footer class="py-12 bg-zinc-900 text-center text-zinc-500 border-t border-zinc-800 mt-20">
+    <p class="uppercase tracking-widest text-sm">&copy; 2026 Car Rental. Всі права захищені.</p>
+</footer>
 {% endblock %}

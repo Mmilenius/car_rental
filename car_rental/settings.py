@@ -31,6 +31,13 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    "allauth_ui",
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    'allauth.socialaccount.providers.google',
+    'allauth.socialaccount.providers.apple',
+    'allauth.socialaccount.providers.github',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -38,6 +45,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.postgres',
+    "widget_tweaks",
+    "slippers",
 
     "debug_toolbar",
 
@@ -46,6 +55,7 @@ INSTALLED_APPS = [
     'users',
     'carts',
     'orders',
+    'ai_agent',
 ]
 
 MIDDLEWARE = [
@@ -56,6 +66,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'allauth.account.middleware.AccountMiddleware',
 
     "debug_toolbar.middleware.DebugToolbarMiddleware",
 ]
@@ -128,7 +139,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'UK-uk'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Europe/Kiev'
 
 USE_I18N = True
 
@@ -158,6 +169,70 @@ INTERNAL_IPS = [
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+# 🔹 кастомний користувач
 AUTH_USER_MODEL = 'users.User'
-LOGIN_URL = '/users/login/'
-LOGIN_REDIRECT_URL = '/'
+
+# 🔹 allauth
+SITE_ID = 1
+LOGIN_URL = '/accounts/login/'
+LOGIN_REDIRECT_URL = '/users/profile/'
+ACCOUNT_LOGOUT_REDIRECT_URL = '/'
+ACCOUNT_EMAIL_CONFIRMATION_AUTHENTICATED_REDIRECT_URL = '/'
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
+    'allauth.account.auth_backends.AuthenticationBackend',
+]
+
+# 🔹 нові налаштування django-allauth
+ACCOUNT_LOGIN_METHODS = {"username", "email"}  # можна логінитись по username або email
+ACCOUNT_SIGNUP_FIELDS = ['username*', 'email*', 'password1*', 'password2*']
+ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_EMAIL_VERIFICATION = 'mandatory'  # обов'язкове підтвердження email
+ACCOUNT_USERNAME_REQUIRED = True
+ACCOUNT_SIGNUP_EMAIL_ENTER_TWICE = False
+ACCOUNT_SIGNUP_PASSWORD_ENTER_TWICE = True
+ACCOUNT_LOGIN_ATTEMPTS_LIMIT = 5
+ACCOUNT_LOGIN_ATTEMPTS_TIMEOUT = 600
+ACCOUNT_LOGIN_ON_EMAIL_CONFIRMATION = True
+
+# для тестів пошта буде показуватись у консолі
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+# Кастомні адаптери
+
+
+# провайдери соцмереж
+SOCIALACCOUNT_PROVIDERS = {
+    'google': {
+        'SCOPE': [
+            'profile',
+            'email',
+        ],
+        'AUTH_PARAMS': {
+            'access_type': 'online',
+        },
+        'OAUTH_PKCE_ENABLED': True,
+    },
+    'apple': {
+        'SCOPE': ['name', 'email'],
+        'AUTH_PARAMS': {'response_mode': 'form_post'},
+    },
+    'github': {
+        'SCOPE': ['user', 'user:email'],
+        'AUTH_PARAMS': {'allow_signup': 'true'},
+    },
+}
+# Додаткові AllAuth налаштування
+ACCOUNT_FORMS = {
+    'login': 'users.forms.UserLoginForm',
+    'signup': 'users.forms.UserRegistationForm',
+}
+
+# Автоматично заповнювати поля з соцмереж
+SOCIALACCOUNT_AUTO_SIGNUP = True
+SOCIALACCOUNT_QUERY_EMAIL = True
+ALLAUTH_UI_THEME = "light"
+
+STRIPE_PUBLIC_KEY = 'pk_test_51S7Zr6GXClxGwxcBKE7TfkMQpMCjCT1v4XXcCJzTlOiXhxiLjG0uk6E4M2x9EoJgvgLO3Pm4uHhkzAyXh0v2lmhb00F6rKW3Uk'
+STRIPE_SECRET_KEY = ''
+STRIPE_WEBHOOK_SECRET = 'ваш_webhook_секрет'

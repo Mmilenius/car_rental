@@ -1,22 +1,21 @@
-{%  extends 'base.html' %}
+{% extends 'base.html' %}
 {% load static %}
 {% load carts_tags %}
 
+{% block modal_cart %}
+    {% include 'includes/cart_button.html' %}
+{% endblock %}
 
 {% block content %}
-    {% user_carts request as carts %}
-<!-- Контент на сторінці -->
-<div class="row">
-    <div class="container mt-5">
-        <div class="row justify-content-center">
-            <div class="bg-white p-4 mb-4 mx-2 rounded custom-shadow">
-                <h3 class="text-center mb-4">Кошик</h3>
-                <div class="container" id="cart-items-container">
-                    <!-- Розмітка кошика -->
-                    {% include 'carts/includes/included_cart.html' %}
-                    <!-- Закінчилась розмітка кошика -->
-                </div>
-            </div>
+{% user_carts request as carts %}
+<div class="max-w-7xl mx-auto py-12 px-4">
+    <div class="bg-white rounded-3xl shadow-xl border border-zinc-100 overflow-hidden">
+        <div class="bg-zinc-900 px-8 py-6 text-center">
+            <h2 class="text-2xl font-black text-white uppercase tracking-wider">Кошик бронювань</h2>
+        </div>
+
+        <div class="p-6 md:p-8" id="cart-items-container">
+            {% include 'carts/includes/included_cart.html' %}
         </div>
     </div>
 </div>

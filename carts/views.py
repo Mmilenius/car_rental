@@ -1,19 +1,15 @@
 from django.http import JsonResponse
+from django.template.loader import render_to_string
 from django.views import View
 from carts.mixins import CartMixin
 from carts.models import Cart
 from cars.models import Cars
-
+from carts.utils import get_user_carts # Переконайтесь, що цей імпорт правильний для вашого проекту
 
 class CartAddView(CartMixin, View):
-    """
-    View для додавання машини в кошик
-    """
-
     def post(self, request):
         car_id = request.POST.get("car_id")
         car = Cars.objects.get(id=car_id)
-
         cart = self.get_cart(request, car=car)
 
         if cart:
@@ -27,54 +23,46 @@ class CartAddView(CartMixin, View):
                 period=1
             )
 
-        response_data = {
+        # Отримуємо оновлений кошик для підрахунку кількості
+        user_cart = get_user_carts(request)
+        cart_items_html = self.render_cart(request)
+
+        return JsonResponse({
             "message": "Машина додана в кошик",
-            'cart_items_html': self.render_cart(request)
-        }
-
-        return JsonResponse(response_data)
-
+            "cart_items_html": cart_items_html,
+            "total_quantity": user_cart.total_quantity() if user_cart else 0,
+        })
 
 class CartChangeView(CartMixin, View):
-    """
-    View для зміни періоду в кошику
-    """
-
     def post(self, request):
         cart_id = request.POST.get("cart_id")
-
         cart = self.get_cart(request, cart_id=cart_id)
 
+        # Зберігаємо період
         cart.period = int(request.POST.get("period"))
         cart.save()
 
-        period = cart.period
+        # Оновлюємо дані
+        user_cart = get_user_carts(request)
+        cart_items_html = self.render_cart(request)
 
-        response_data = {
+        return JsonResponse({
             "message": "Період оновлено",
-            "period": period,
-            'cart_items_html': self.render_cart(request)
-        }
-
-        return JsonResponse(response_data)
-
+            "cart_items_html": cart_items_html,
+            "total_quantity": user_cart.total_quantity() if user_cart else 0,
+        })
 
 class CartRemoveView(CartMixin, View):
-    """
-    View для видалення машини з кошика
-    """
-
     def post(self, request):
         cart_id = request.POST.get("cart_id")
-
         cart = self.get_cart(request, cart_id=cart_id)
-        period = cart.period
         cart.delete()
 
-        response_data = {
-            "message": "Машину видалено",
-            "period_deleted": period,
-            'cart_items_html': self.render_cart(request)
-        }
+        user_cart = get_user_carts(request)
+        cart_items_html = self.render_cart(request)
 
-        return JsonResponse(response_data)
+        return JsonResponse({
+            "message": "Машину видалено",
+            "cart_items_html": cart_items_html,
+            "total_quantity": user_cart.total_quantity() if user_cart else 0,
+        })

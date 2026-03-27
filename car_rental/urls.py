@@ -27,9 +27,11 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('main.urls', namespace='main')),
     path('catalog/', include('cars.urls', namespace='catalog')),
+    path('accounts/', include('allauth.urls')),
     path('users/', include('users.urls', namespace='users')),
     path('carts/', include('carts.urls', namespace='carts')),
     path('orders/', include('orders.urls', namespace='orders')),
+    path('ai/', include('ai_agent.urls', namespace='ai_agent')),
 ] + debug_toolbar_urls()
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -6,6 +6,9 @@ from django.shortcuts import render, redirect
 from django.urls import reverse
 from django.views import View
 from django.views.generic import FormView, TemplateView
+from django.http import JsonResponse
+from users.models import Favorite
+from cars.models import Cars
 from carts.models import Cart
 from orders.models import Order, OrderItem
 from users.forms import UserLoginForm, UserRegistationForm, ProfileForm
@@ -127,3 +130,48 @@ class UserLogoutView(View):
         messages.success(request, f'{request.user.username}, Ви вийшли з аккаунта')
         auth.logout(request)
         return redirect(reverse('main:index'))
+
+
+@login_required
+def user_favorites(request):
+    """Сторінка з обраними авто"""
+    favorites = Favorite.objects.filter(user=request.user).select_related('car')
+    # Витягуємо самі об'єкти машин зі зв'язку
+    cars = [fav.car for fav in favorites]
+
+    context = {
+        'title': 'Мої обрані авто',
+        'cars': cars,
+    }
+    return render(request, 'users/favorites.html', context)
+
+
+@login_required
+def toggle_favorite(request):
+    """AJAX функція для додавання/видалення з обраного"""
+    if request.method == 'POST':
+        car_id = request.POST.get('car_id')
+        car = Cars.objects.get(id=car_id)
+
+        favorite, created = Favorite.objects.get_or_create(user=request.user, car=car)
+
+        if not created:
+            # Якщо запис вже був - значить видаляємо (toggle)
+            favorite.delete()
+            is_favorited = False
+            message = "Видалено з обраного"
+        else:
+            is_favorited = True
+            message = "Додано в обране"
+
+        # Рахуємо нову кількість
+        favorites_count = Favorite.objects.filter(user=request.user).count()
+
+        return JsonResponse({
+            'status': 'ok',
+            'is_favorited': is_favorited,
+            'favorites_count': favorites_count,
+            'message': message
+        })
+
+    return JsonResponse({'status': 'error'}, status=400)

@@ -1,19 +1,15 @@
 from django.db import models
-
-# Create your models here.
 from cars.models import Cars
-
 from users.models import User
 
 
 class OrderitemQueryset(models.QuerySet):
-
     def total_price(self):
-        return sum(cart.cars_price() for cart in self)
+        return sum(item.total_price() for item in self)
 
     def total_period(self):
         if self:
-            return sum(cart.period for cart in self)
+            return sum(item.period for item in self)
         return 0
 
 
@@ -37,13 +33,22 @@ class Order(models.Model):
         ordering = ("id",)
 
     def __str__(self):
-        return f"Замовлдення № {self.pk} | Клієнт {self.user.first_name} {self.user.last_name}"
+        return f"Замовлення № {self.pk} | Клієнт {self.user.first_name} {self.user.last_name}"
+
+    def total_price(self):
+        """Повертає загальну вартість замовлення"""
+        return self.orderitem_set.aggregate(
+            total=models.Sum(
+                models.F('price') * models.F('period'),
+                output_field=models.DecimalField(max_digits=10, decimal_places=2)
+            )
+        )['total'] or 0
 
 
 class OrderItem(models.Model):
     order = models.ForeignKey(to=Order, on_delete=models.CASCADE, verbose_name="Замовлення")
     car = models.ForeignKey(to=Cars, on_delete=models.SET_DEFAULT, null=True, verbose_name="Машина",
-                                default=None)
+                            default=None)
     name = models.CharField(max_length=150, verbose_name="Назва")
     price = models.DecimalField(max_digits=7, decimal_places=2, verbose_name="Ціна")
     period = models.PositiveIntegerField(default=0, verbose_name="Термін")
@@ -57,8 +62,9 @@ class OrderItem(models.Model):
 
     objects = OrderitemQueryset.as_manager()
 
-    def cars_price(self):
-        return round(self.cars.price_for_sell() * self.period, 2)
+    def total_price(self):
+        """Повертає загальну вартість цього елемента замовлення"""
+        return round(self.price * self.period, 2)
 
     def __str__(self):
         return f"Машина {self.name} | Замовлення № {self.order.pk}"

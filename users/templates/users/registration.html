@@ -2,95 +2,72 @@
 {% load static %}
 
 {% block modal_cart %}
-	{% include 'includes/cart_button.html' %}
+    {% include 'includes/cart_button.html' %}
 {% endblock %}
 
 {% block content %}
-	<!-- Контент -->
-<div class="container">
-    <div class="row mt-1">
-        <div class="col-lg-2">
-            <!-- Порожній блок на розсуд -->
+<div class="min-h-[80vh] flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 bg-gray-50">
+    <div class="max-w-2xl w-full space-y-8 bg-white p-10 rounded-3xl shadow-xl border border-zinc-100">
+        <div class="text-center">
+            <h2 class="text-3xl font-black text-zinc-900">Створення акаунту</h2>
+            <p class="mt-2 text-sm text-zinc-500">Приєднуйтесь до АвтоГармонія Рент</p>
         </div>
-        <div class="col-lg-10">
-            <!-- Контент на сторінці -->
-            <div class="row">
-                <div class="container mt-5">
-                    <div class="row justify-content-center">
-                        <div class="col-md-9 bg-white p-4 mb-5 mx-2 rounded custom-shadow">
-                            <h2 class="text-center mb-4">Реєстрація</h2>
-                            <form action="{% url 'users:registration' %}" method="post">
-                                {% csrf_token %}
-                                <div class="row">
-                                    <div class="col-md-6 mb-3">
-                                        <label for="id_firstName" class="form-label">Ім’я*</label>
-                                        <input type="text" class="form-control" id="id_firstName"
-                                               value="{% if form.first_name.value %}{{ form.first_name.value }}{% endif %}"
-                                               name="first_name"
-                                               placeholder="Введіть ваше ім’я" required>
-                                            {% if form.first_name.errors %}
-                                            <div class="alert alert-danger alert-dismissible fade show">{{ form.first_name.errors }}</div>
-                                            {% endif %}
-                                    </div>
-                                    <div class="col-md-6 mb-3">
-                                        <label for="id_lastName" class="form-label">Прізвище*</label>
-                                        <input type="text" class="form-control" id="id_lastName"
-                                               value="{% if form.last_name.value %}{{ form.last_name.value }}{% endif %}"
-                                               name="last_name"
-                                               placeholder="Введіть ваше прізвище" required>
-                                               {% if form.last_name.errors %}
-                                               <div class="alert alert-danger alert-dismissible fade show">{{ form.last_name.errors }}</div>
-                                               {% endif %}
-                                    </div>
-                                    <div class="col-md-6 mb-3">
-                                        <label for="id_username" class="form-label">Ім’я користувача*</label>
-                                        <input type="text" class="form-control" id="id_username"
-                                               value="{% if form.username.value %}{{ form.username.value }}{% endif %}"
-                                               name="username"
-                                               placeholder="Введіть ім’я користувача" required>
-                                               {% if form.username.errors %}
-                                               <div class="alert alert-danger alert-dismissible fade show">{{ form.username.errors }}</div>
-                                               {% endif %}
-                                    </div>
-                                    <div class="col-md-6 mb-3">
-                                        <label for="id_email" class="form-label">Email*</label>
-                                        <input type="email" class="form-control" id="id_email"
-                                               value="{% if form.email.value %}{{ form.email.value }}{% endif %}"
-                                               name="email"
-                                               placeholder="Введіть ваш email" required>
-                                               {% if form.email.errors %}
-                                               <div class="alert alert-danger alert-dismissible fade show">{{ form.email.errors }}</div>
-                                               {% endif %}
-                                    </div>
-                                    <div class="col-md-6 mb-3">
-                                        <label for="id_password1" class="form-label">Пароль*</label>
-                                        <input type="password" class="form-control" id="id_password1"
-                                               value="{% if form.password1.value %}{{ form.password1.value }}{% endif %}"
-                                               name="password1"
-                                               placeholder="Введіть пароль" required>
-                                               {% if form.password1.errors %}
-                                               <div class="alert alert-danger alert-dismissible fade show">{{ form.password1.errors }}</div>
-                                               {% endif %}
-                                    </div>
-                                    <div class="col-md-6 mb-3">
-                                        <label for="id_password2" class="form-label">Підтвердження пароля*</label>
-                                        <input type="password" class="form-control" id="id_password2"
-                                               value="{% if form.password2.value %}{{ form.password2.value }}{% endif %}"
-                                               name="password2"
-                                               placeholder="Підтвердіть пароль" required>
-                                               {% if form.password2.errors %}
-                                               <div class="alert alert-danger alert-dismissible fade show">{{ form.password2.errors }}</div>
-                                               {% endif %}
-                                    </div>
-                                </div>
-                                <button type="submit" class="btn btn-dark btn-block">Зареєструватися</button>
-                            </form>
-                        </div>
-                    </div>
+
+        <form class="mt-8 space-y-6" action="{% url 'users:registration' %}" method="post">
+            {% csrf_token %}
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label for="id_first_name" class="block text-sm font-bold text-zinc-700 mb-1">Ім’я <span class="text-red-500">*</span></label>
+                    <input type="text" name="first_name" id="id_first_name" value="{% if form.first_name.value %}{{ form.first_name.value }}{% endif %}" required
+                           class="w-full bg-zinc-50 border border-zinc-200 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500 transition" placeholder="Іван">
+                    {% if form.first_name.errors %}<p class="text-red-500 text-xs mt-1">{{ form.first_name.errors.0 }}</p>{% endif %}
+                </div>
+
+                <div>
+                    <label for="id_last_name" class="block text-sm font-bold text-zinc-700 mb-1">Прізвище <span class="text-red-500">*</span></label>
+                    <input type="text" name="last_name" id="id_last_name" value="{% if form.last_name.value %}{{ form.last_name.value }}{% endif %}" required
+                           class="w-full bg-zinc-50 border border-zinc-200 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500 transition" placeholder="Петренко">
+                    {% if form.last_name.errors %}<p class="text-red-500 text-xs mt-1">{{ form.last_name.errors.0 }}</p>{% endif %}
+                </div>
+
+                <div>
+                    <label for="id_username" class="block text-sm font-bold text-zinc-700 mb-1">Логін <span class="text-red-500">*</span></label>
+                    <input type="text" name="username" id="id_username" value="{% if form.username.value %}{{ form.username.value }}{% endif %}" required
+                           class="w-full bg-zinc-50 border border-zinc-200 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500 transition" placeholder="user123">
+                    {% if form.username.errors %}<p class="text-red-500 text-xs mt-1">{{ form.username.errors.0 }}</p>{% endif %}
+                </div>
+
+                <div>
+                    <label for="id_email" class="block text-sm font-bold text-zinc-700 mb-1">Email <span class="text-red-500">*</span></label>
+                    <input type="email" name="email" id="id_email" value="{% if form.email.value %}{{ form.email.value }}{% endif %}" required
+                           class="w-full bg-zinc-50 border border-zinc-200 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500 transition" placeholder="email@example.com">
+                    {% if form.email.errors %}<p class="text-red-500 text-xs mt-1">{{ form.email.errors.0 }}</p>{% endif %}
+                </div>
+
+                <div>
+                    <label for="id_password1" class="block text-sm font-bold text-zinc-700 mb-1">Пароль <span class="text-red-500">*</span></label>
+                    <input type="password" name="password1" id="id_password1" required
+                           class="w-full bg-zinc-50 border border-zinc-200 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500 transition" placeholder="••••••••">
+                    {% if form.password1.errors %}<p class="text-red-500 text-xs mt-1">{{ form.password1.errors.0 }}</p>{% endif %}
+                </div>
+
+                <div>
+                    <label for="id_password2" class="block text-sm font-bold text-zinc-700 mb-1">Підтвердження <span class="text-red-500">*</span></label>
+                    <input type="password" name="password2" id="id_password2" required
+                           class="w-full bg-zinc-50 border border-zinc-200 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500 transition" placeholder="••••••••">
+                    {% if form.password2.errors %}<p class="text-red-500 text-xs mt-1">{{ form.password2.errors.0 }}</p>{% endif %}
                 </div>
             </div>
-        </div>
+
+            <button type="submit" class="w-full bg-zinc-900 hover:bg-zinc-800 text-white text-lg font-bold py-4 rounded-xl transition shadow-lg mt-6">
+                Зареєструватися
+            </button>
+
+            <p class="text-center text-sm text-zinc-500">
+                Вже маєте акаунт? <a href="{% url 'users:login' %}" class="font-bold text-blue-600 hover:underline">Увійти</a>
+            </p>
+        </form>
     </div>
 </div>
-
 {% endblock %}

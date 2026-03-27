@@ -1,39 +1,73 @@
 {% load static %}
 {% load carts_tags %}
 
-{% if form.non_field_errors %}
-	<div class="container mt-4">
-    <div class="row justify-content-center">
-        <div class="col-md-6">
-            <div class="alert alert-danger alert-dismissible fade show custom-shadow" role="alert">
-                {{ form.non_field_errors }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
-        </div>
-    </div>
-</div>
-{% endif %}
+<div class="fixed top-24 right-5 z-[110] flex flex-col gap-3 w-full max-w-sm pointer-events-none">
 
-<div class="container mt-4">
-    <div class="row justify-content-center">
-        <div class="col-md-6">
-            {% if messages %}
-                {% for message in messages %}
-                    {% if message.tags == 'success' %}
-                    <div id="notification" class="position-fixed start-50 translate-middle-x z-3 alert alert-success fade show custom-shadow" role="alert">
-                        {{ message }}
-                    </div>
-                    {% endif %}
-                    {% if message.tags == 'warning' %}
-                    <div id="notification" class="position-fixed start-50 translate-middle-x z-3 alert alert-danger fade show custom-shadow" role="alert">
-                        {{ message }}
-                    </div>
-                    {% endif %}
-                {% endfor %}
-            {% else %}
-            <div id="jq-notification" class="position-fixed start-50 translate-middle-x z-3 alert alert-success fade show custom-shadow" style="display: none;" role="alert">
+    {% if messages %}
+        {% for message in messages %}
+        <div class="notification-toast pointer-events-auto transform transition-all duration-300 translate-x-full opacity-0 bg-white border-l-4 shadow-xl rounded-r-lg overflow-hidden flex items-start p-4
+             {% if message.tags == 'success' %}border-green-500{% elif message.tags == 'warning' or message.tags == 'error' %}border-red-500{% else %}border-blue-500{% endif %}">
+
+            <div class="flex-shrink-0">
+                {% if message.tags == 'success' %}
+                    <svg class="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                {% elif message.tags == 'warning' or message.tags == 'error' %}
+                    <svg class="w-5 h-5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                {% else %}
+                    <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                {% endif %}
             </div>
-            {% endif %}
+
+            <div class="ml-3 w-0 flex-1 pt-0.5">
+                <p class="text-sm font-medium text-gray-900">{{ message }}</p>
+            </div>
+
+            <div class="ml-4 flex-shrink-0 flex">
+                <button onclick="this.closest('.notification-toast').remove()" class="bg-white rounded-md inline-flex text-gray-400 hover:text-gray-500 focus:outline-none">
+                    <span class="sr-only">Закрити</span>
+                    <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>
+                </button>
+            </div>
+        </div>
+        {% endfor %}
+    {% endif %}
+
+    <div id="jq-notification" class="pointer-events-auto hidden transform transition-all duration-300 translate-x-full opacity-0 bg-white border-l-4 border-green-500 shadow-xl rounded-r-lg p-4 flex items-start">
+        <div class="flex-shrink-0">
+            <svg class="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+        </div>
+        <div class="ml-3 w-0 flex-1 pt-0.5">
+            <p class="text-sm font-medium text-gray-900 message-text"></p>
         </div>
     </div>
+
+    {% if form.non_field_errors %}
+        <div class="notification-toast pointer-events-auto bg-white border-l-4 border-red-500 shadow-xl rounded-r-lg p-4 flex items-start">
+            <div class="flex-shrink-0">
+                <svg class="w-5 h-5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            </div>
+            <div class="ml-3 w-0 flex-1 pt-0.5">
+                <p class="text-sm font-medium text-gray-900">{{ form.non_field_errors }}</p>
+            </div>
+            <button onclick="this.closest('.notification-toast').remove()" class="ml-4 text-gray-400 hover:text-gray-500">&times;</button>
+        </div>
+    {% endif %}
 </div>
+
+<script>
+    // Анімація появи тостів
+    document.addEventListener('DOMContentLoaded', function() {
+        const toasts = document.querySelectorAll('.notification-toast');
+        toasts.forEach((toast, index) => {
+            setTimeout(() => {
+                toast.classList.remove('translate-x-full', 'opacity-0');
+            }, 100 * (index + 1));
+
+            // Автоматичне зникнення через 5 секунд
+            setTimeout(() => {
+                toast.classList.add('translate-x-full', 'opacity-0');
+                setTimeout(() => toast.remove(), 300);
+            }, 5000 + (100 * index));
+        });
+    });
+</script>

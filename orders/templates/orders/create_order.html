@@ -2,133 +2,127 @@
 {% load static %}
 {% load carts_tags %}
 
-
 {% block content %}
-	<!-- Контент -->
-<div class="container">
-    <div class="row mt-1">
-        <div class="col-lg-2">
-            <!-- Порожній блок на розсуд -->
-        </div>
-        <div class="col-lg-10">
-            <!-- Контент на сторінці -->
-            <div class="bg-white p-4 mb-4 mx-2 rounded custom-shadow">
-                <div class="container">
-                    <h3 class="text-center mb-4">Обрані товари</h3>
-                    <div class="container" id="cart-items-container">
-                        <!-- Розмітка кошика -->
-                        {% user_carts request as carts %}
-                        {% include 'carts/includes/included_cart.html' %}
-                        <!-- Завершення розмітки кошика -->
-                    </div>
-                </div>
-                <!-- Деталі замовлення -->
-                <div class="container">
-                    <h3 class="text-center">Деталі бронювання</h3>
-                    <div class="card mb-3">
-                        <div class="card-body">
-                            <form action="{% url 'orders:create_order' %}" method = 'post'>
-                                {% csrf_token %}
-                                <div class="row">
-                                    <div class="col-md-6 mb-3">
-                                        <label for="id_first_name" class="form-label">Ім’я*:</label>
-                                        <input type="text" class="form-control" id="id_first_name"
-                                               value="{% if form.first_name.value %}{{ form.first_name.value }}{% endif %}"
-                                            name="first_name" required>
-                                            {% if form.first_name.errors %}
-                                                <div class="alert alert-danger alert-dismissible fade show">{{ form.first_name.errors }}</div>
-                                            {% endif %}
-                                    </div>
-                                    <div class="col-md-6 mb-3">
-                                        <label for="id_last_name" class="form-label">Прізвище*:</label>
-                                        <input type="text" class="form-control" id="id_last_name"
-                                               value="{% if form.last_name.value %}{{ form.last_name.value }}{% endif %}"
-                                               name="last_name" required>
-                                                {% if form.last_name.errors %}
-                                                    <div class="alert alert-danger alert-dismissible fade show">{{ form.last_name.errors }}</div>
-                                                {% endif %}
-                                    </div>
-                                    <div class="col-md-6 mb-3">
-                                        <label for="id_phone_number" class="form-label">Номер телефону*:</label>
-                                        <input type="text" class="form-control" id="id_phone_number"
-                                               value="{% if form.phone_number.value %}{{ form.phone_number.value }}{% endif %}"
-                                               name="phone_number"
-                                            placeholder="У форматі: XXX-XXX-XX-XX"
-                                            required>
-                                            {% if form.phone_number.errors %}
-                                               <div class="alert alert-danger alert-dismissible fade show">{{ form.phone_number.errors }}</div>
-                                            {% endif %}
-                                    </div>
-                                    <div class="row mb-3">
-                                        <div class="col-md-6">
-                                            <label for="id_start_date" class="form-label">Дата початку оренди*</label>
-                                            <input type="date" class="form-control" id="id_start_date" name="start_date" required>
-                                            {% if form.start_date.errors %}
-                                                <div class="alert alert-danger alert-dismissible fade show">{{ form.start_date.errors }}</div>
-                                            {% endif %}
-                                        </div>
-                                        <div class="col-md-6">
-                                            <label for="id_end_date" class="form-label">Дата завершення оренди*</label>
-                                            <input type="date" class="form-control" id="id_end_date" name="end_date" required>
-                                            {% if form.end_date.errors %}
-                                                <div class="alert alert-danger alert-dismissible fade show">{{ form.end_date.errors }}</div>
-                                            {% endif %}
-                                        </div>
-                                    </div>
-                                    <div class="col-md-12 mb-3">
-                                        <label for="delivery" class="form-label">Потрібна доставка авто до мене: </label>
-                                        <div class="form-check form-check-inline">
-                                            <input class="form-check-input" type="radio" name="requires_delivery"
-                                                id="id_requires_delivery" value="1" checked>
+<div class="max-w-7xl mx-auto py-10 px-4">
+    <div class="flex flex-col lg:flex-row gap-10">
 
-                                            <label class="form-check-label" for="id_requires_delivery">Так</label>
-                                        </div>
-                                        <div class="form-check form-check-inline">
-                                            <input class="form-check-input" type="radio" name="requires_delivery"
-                                                id="id_requires_delivery" value="0">
-                                            <label class="form-check-label" for="id_requires_delivery">Ні</label>
-                                            {% if form.requires_delivery.errors %}
-                                                <div class="alert alert-danger alert-dismissible fade show">{{form.requires_delivery.errors}}</div>
-                                            {% endif %}
-                                        </div>
-                                    </div>
-                                    <div class="mb-3" id="deliveryAddressField">
-                                        <label for="id_delivery_address" class="form-label">Адреса
-                                            доставки*:</label>
-                                        <textarea class="form-control" id="id_delivery_address"
-                                            value="{% if form.delivery_address.value %}{{ form.delivery_address.value }}{% endif %}"
-                                                  name="delivery_address" rows="2"></textarea>
-                                                {% if form.last_name.errors %}
-                                                    <div class="alert alert-danger alert-dismissible fade show">{{ form.delivery_address.errors }}</div>
-                                                {% endif %}
-                                    </div>
-                                    <div class="col-md-12 mb-3">
-                                        <label class="form-label">Спосіб оплати: </label>
-                                        <div class="form-check form-check-inline">
-                                            <input class="form-check-input" type="radio" name="payment_on_get"
-                                                id="id_payment_on_get" value="0" checked>
-                                            <label class="form-check-label" for="id_payment_on_get">Оплата
-                                                карткою</label>
-                                        </div>
-                                        <div class="form-check form-check-inline">
-                                            <input class="form-check-input" type="radio" name="payment_on_get"
-                                                id="id_payment_on_get" value="1">
-                                            <label class="form-check-label" for="id_payment_on_get">Готівкою/карткою
-                                                при отриманні</label>
-                                            {% if form.payment_on_get.errors %}
-                                                <div class="alert alert-danger alert-dismissible fade show">{{form.payment_on_get.errors}}</div>
-                                            {% endif %}
-                                        </div>
-                                    </div>
-                                </div>
-                                <button type="submit" class="btn btn-dark">Оформити бронювання</button>
-                            </form>
+        <div class="lg:w-1/2 order-2 lg:order-1">
+            <div id="cart-items-container">
+                {% user_carts request as carts %}
+                {% include 'carts/includes/included_cart.html' %}
+            </div>
+        </div>
+
+        <div class="lg:w-1/2 order-1 lg:order-2">
+            <div class="bg-white rounded-3xl shadow-xl border border-zinc-100 p-8">
+                <h2 class="text-2xl font-black text-zinc-900 mb-6 flex items-center gap-2">
+                    <span class="w-2 h-8 bg-blue-600 rounded-full"></span>
+                    Деталі клієнта
+                </h2>
+
+                <form action="{% url 'orders:create_order' %}" method="post" class="space-y-6">
+                    {% csrf_token %}
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label for="id_first_name" class="block text-sm font-bold text-zinc-700 mb-2">Ім’я <span class="text-red-500">*</span></label>
+                            <input type="text" class="w-full bg-zinc-50 border border-zinc-200 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition"
+                                   id="id_first_name" name="first_name"
+                                   value="{% if form.first_name.value %}{{ form.first_name.value }}{% endif %}" required>
+                            {% if form.first_name.errors %}
+                                <div class="text-red-500 text-xs mt-1">{{ form.first_name.errors }}</div>
+                            {% endif %}
+                        </div>
+                        <div>
+                            <label for="id_last_name" class="block text-sm font-bold text-zinc-700 mb-2">Прізвище <span class="text-red-500">*</span></label>
+                            <input type="text" class="w-full bg-zinc-50 border border-zinc-200 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition"
+                                   id="id_last_name" name="last_name"
+                                   value="{% if form.last_name.value %}{{ form.last_name.value }}{% endif %}" required>
+                            {% if form.last_name.errors %}
+                                <div class="text-red-500 text-xs mt-1">{{ form.last_name.errors }}</div>
+                            {% endif %}
                         </div>
                     </div>
-                </div>
+
+                    <div>
+                        <label for="id_phone_number" class="block text-sm font-bold text-zinc-700 mb-2">Номер телефону <span class="text-red-500">*</span></label>
+                        <input type="text" class="w-full bg-zinc-50 border border-zinc-200 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition"
+                               id="id_phone_number" name="phone_number"
+                               value="{% if form.phone_number.value %}{{ form.phone_number.value }}{% endif %}"
+                               placeholder="+38 (XXX) XXX-XX-XX" required>
+                        {% if form.phone_number.errors %}
+                            <div class="text-red-500 text-xs mt-1">{{ form.phone_number.errors }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 bg-blue-50 p-5 rounded-2xl border border-blue-100">
+                        <div>
+                            <label for="id_start_date" class="block text-xs font-bold text-blue-800 uppercase mb-2">Дата початку</label>
+                            <input type="date" class="w-full bg-white border border-blue-200 rounded-xl px-4 py-2 text-zinc-900 focus:ring-2 focus:ring-blue-500 outline-none"
+                                   id="id_start_date" name="start_date" required>
+                            {% if form.start_date.errors %}
+                                <div class="text-red-500 text-xs mt-1">{{ form.start_date.errors }}</div>
+                            {% endif %}
+                        </div>
+                        <div>
+                            <label for="id_end_date" class="block text-xs font-bold text-blue-800 uppercase mb-2">Дата завершення</label>
+                            <input type="date" class="w-full bg-white border border-blue-200 rounded-xl px-4 py-2 text-zinc-900 focus:ring-2 focus:ring-blue-500 outline-none"
+                                   id="id_end_date" name="end_date" required>
+                            {% if form.end_date.errors %}
+                                <div class="text-red-500 text-xs mt-1">{{ form.end_date.errors }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="space-y-4">
+                        <label class="block text-sm font-bold text-zinc-700">Потрібна доставка авто?</label>
+                        <div class="flex gap-4">
+                            <label class="flex items-center gap-3 p-3 border border-zinc-200 rounded-xl cursor-pointer hover:bg-zinc-50 transition w-full">
+                                <input class="w-5 h-5 text-blue-600 focus:ring-blue-500 border-gray-300" type="radio" name="requires_delivery" id="id_requires_delivery_yes" value="1" checked onclick="document.getElementById('deliveryAddressField').style.display = 'block'">
+                                <span class="font-medium text-zinc-900">Так, потрібна</span>
+                            </label>
+                            <label class="flex items-center gap-3 p-3 border border-zinc-200 rounded-xl cursor-pointer hover:bg-zinc-50 transition w-full">
+                                <input class="w-5 h-5 text-blue-600 focus:ring-blue-500 border-gray-300" type="radio" name="requires_delivery" id="id_requires_delivery_no" value="0" onclick="document.getElementById('deliveryAddressField').style.display = 'none'">
+                                <span class="font-medium text-zinc-900">Ні, заберу сам</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div id="deliveryAddressField">
+                        <label for="id_delivery_address" class="block text-sm font-bold text-zinc-700 mb-2">Адреса доставки <span class="text-red-500">*</span></label>
+                        <textarea class="w-full bg-zinc-50 border border-zinc-200 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition"
+                                  id="id_delivery_address" name="delivery_address" rows="3" placeholder="Місто, вулиця, номер будинку">{% if form.delivery_address.value %}{{ form.delivery_address.value }}{% endif %}</textarea>
+                        {% if form.delivery_address.errors %}
+                            <div class="text-red-500 text-xs mt-1">{{ form.delivery_address.errors }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="space-y-4 pt-6 border-t border-zinc-100">
+                        <label class="block text-sm font-bold text-zinc-700">Спосіб оплати</label>
+                        <div class="grid grid-cols-1 gap-3">
+                            <label class="flex items-center gap-4 p-4 border border-zinc-200 rounded-xl cursor-pointer hover:border-blue-500 hover:bg-blue-50/50 transition">
+                                <input class="w-5 h-5 text-blue-600 focus:ring-blue-500" type="radio" name="payment_on_get" id="id_payment_card" value="0" checked>
+                                <div>
+                                    <span class="block font-bold text-zinc-900">Онлайн оплата карткою</span>
+                                    <span class="text-xs text-zinc-500">Visa, Mastercard, Google Pay</span>
+                                </div>
+                            </label>
+                            <label class="flex items-center gap-4 p-4 border border-zinc-200 rounded-xl cursor-pointer hover:border-blue-500 hover:bg-blue-50/50 transition">
+                                <input class="w-5 h-5 text-blue-600 focus:ring-blue-500" type="radio" name="payment_on_get" id="id_payment_cash" value="1">
+                                <div>
+                                    <span class="block font-bold text-zinc-900">При отриманні</span>
+                                    <span class="text-xs text-zinc-500">Готівкою або терміналом</span>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="w-full bg-zinc-900 hover:bg-zinc-800 text-white text-lg font-bold py-4 rounded-xl transition shadow-lg mt-6">
+                        Оформити бронювання
+                    </button>
+                </form>
             </div>
         </div>
     </div>
 </div>
-
 {% endblock %}

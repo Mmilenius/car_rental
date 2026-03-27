@@ -1,0 +1,93 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="max-w-3xl mx-auto py-16 px-4">
+
+    <div class="text-center mb-12">
+        <div class="w-24 h-24 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
+            <svg class="w-12 h-12 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+        </div>
+        <h2 class="text-4xl font-black text-zinc-900 mb-2">Оплата успішна!</h2>
+        <p class="text-zinc-500 text-lg">Ваше бронювання офіційно підтверджено.</p>
+    </div>
+
+    <div class="bg-white rounded-3xl shadow-xl border border-zinc-100 overflow-hidden mb-8">
+        <div class="bg-green-600 px-8 py-4 text-white flex justify-between items-center">
+            <h5 class="font-bold uppercase tracking-widest text-sm">Замовлення №{{ order.pk }}</h5>
+            <span class="bg-white/20 px-3 py-1 rounded-full text-xs font-bold">{{ order.status }}</span>
+        </div>
+
+        <div class="p-8">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+                <div>
+                    <p class="text-zinc-400 text-xs font-bold uppercase mb-1">Клієнт</p>
+                    <p class="text-zinc-900 font-bold">{{ order.user.first_name }} {{ order.user.last_name }}</p>
+                    <p class="text-zinc-500 text-sm">{{ order.phone_number }}</p>
+                </div>
+                <div>
+                    <p class="text-zinc-400 text-xs font-bold uppercase mb-1">Період оренди</p>
+                    <p class="text-zinc-900 font-bold">{{ order.start_date|date:"d.m.Y" }} – {{ order.end_date|date:"d.m.Y" }}</p>
+                </div>
+            </div>
+
+            <div class="border-t border-zinc-100 pt-6">
+                <h6 class="font-bold text-zinc-900 mb-4">Орендовані авто:</h6>
+                <div class="bg-zinc-50 rounded-2xl p-4">
+                    <table class="w-full text-left">
+                        <thead>
+                            <tr class="text-xs text-zinc-400 uppercase border-b border-zinc-200">
+                                <th class="pb-2 font-bold">Автомобіль</th>
+                                <th class="pb-2 font-bold text-center">Дні</th>
+                                <th class="pb-2 font-bold text-right">Сума</th>
+                            </tr>
+                        </thead>
+                        <tbody class="text-sm">
+                            {% for item in order.orderitem_set.all %}
+                            <tr>
+                                <td class="py-2 font-medium text-zinc-900">{{ item.name }}</td>
+                                <td class="py-2 text-center text-zinc-500">{{ item.period }}</td>
+                                <td class="py-2 text-right font-bold text-zinc-900">{% widthratio item.price 1 item.period %}₴</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                        <tfoot>
+                            <tr class="border-t border-zinc-200">
+                                <td colspan="2" class="pt-3 text-right font-bold text-zinc-500">Загалом:</td>
+                                <td class="pt-3 text-right font-black text-green-600 text-lg">{{ total_amount }}₴</td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="bg-blue-50 border border-blue-100 rounded-2xl p-6 mb-8 flex gap-4 items-start">
+        <svg class="w-6 h-6 text-blue-600 flex-shrink-0 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+        <div>
+            <h4 class="font-bold text-blue-900 mb-1">Що далі?</h4>
+            <p class="text-blue-800 text-sm leading-relaxed">
+                Наш менеджер зв'яжеться з вами найближчим часом для уточнення деталей передачі авто.
+                Лист з підтвердженням вже надіслано на вашу пошту.
+            </p>
+        </div>
+    </div>
+
+    <div class="flex flex-col sm:flex-row justify-center gap-4">
+        <a href="{% url 'users:profile' %}" class="bg-zinc-900 hover:bg-zinc-800 text-white font-bold py-3 px-8 rounded-xl transition shadow-lg flex items-center justify-center gap-2">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+            Особистий кабінет
+        </a>
+        <a href="{% url 'main:index' %}" class="bg-white border border-zinc-300 hover:bg-zinc-50 text-zinc-700 font-bold py-3 px-8 rounded-xl transition flex items-center justify-center gap-2">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
+            На головну
+        </a>
+    </div>
+
+    <div class="text-center mt-12 pt-8 border-t border-zinc-100">
+        <p class="text-zinc-400 text-sm mb-2">Є питання?</p>
+        <p class="font-bold text-zinc-700">+38 (050) 123-45-67 <span class="mx-2 text-zinc-300">|</span> support@carrental.ua</p>
+    </div>
+</div>
+{% endblock %}

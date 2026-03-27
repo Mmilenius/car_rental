@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from django.http import HttpResponse
 
+from cars.models import Cars
 from cars.models import Categories
 from django.views.generic import TemplateView
 
@@ -28,14 +29,13 @@ class AboutView(TemplateView):
         return context
 
 
-#def index(request):
+def index(request):
+    # Отримуємо 3 останні додані авто (або можна відсортувати за популярністю)
+    # [:3] означає "взяти перші 3"
+    cars = Cars.objects.all().order_by('-id')[:3]
 
-    #categories = Categories.objects.all()
-
-    #context = {
-        #   'title': 'Home - Головна',
-        #   'content': 'Прокат автомобілів',
-    #  'categories': categories
-    #}
-
-    #return render(request, 'main/index.html', context)
+    context = {
+        'title': 'Car Rental - Головна',
+        'cars': cars,  # Передаємо автомобілі в шаблон
+    }
+    return render(request, 'main/index.html', context)

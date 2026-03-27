@@ -1,134 +1,177 @@
 {% extends 'base.html' %}
 {% load static %}
 {% load cars_tags %}
-
-{% block modal_cart %}
-	{% include 'includes/cart_button.html' %}
+{% load users_tags %} {% block modal_cart %}
+    {% include 'includes/cart_button.html' %}
 {% endblock %}
 
 {% block content %}
-    
-<!-- Контент -->
-<div class="container">
-    <div class="row mt-1">
-        <div class="col-lg-2">
-            <!-- Порожній блок на ваш розсуд -->
-        </div>
-        <div class="col-lg-10">
-            <!-- Контент на сторінці -->
-            <div class="row">
-                <!-- Форма фільтрів -->
-                <div class="dropdown mb-2">
-                    <button class="btn btn-secondary dropdown-toggle btn-dark" type="button" data-bs-toggle="dropdown"
-                        aria-expanded="false">
-                        Фільтри
-                    </button>
+<div class="py-8 px-4 max-w-[1440px] mx-auto">
+    <div class="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
+        <h1 class="text-2xl font-bold text-zinc-900 uppercase tracking-tight">Наш автопарк</h1>
 
-                    <form action="{% if request.GET.q %}{% url 'catalog:search' %}{% else %}{% url 'catalog:index' slug_url %}{% endif %}" method="get" class="dropdown-menu bg-dark" data-bs-theme="dark">
-                        <div class="form-check text-white mx-3">
-                            <input class="form-check-input" type="checkbox" name="on_sale" id="flexCheckDefault" value="on" {% if request.GET.on_sale == 'on' %}checked{% endif %}>
-                            {% if request.GET.q %}
-                            	<input type="hidden" name="q" value="{{ request.GET.q }}">
-                            {% endif %}
-                            <label class="form-check-label" for="flexCheckDefault">
-                                Авто за акцією
-                            </label>
-                        </div>
-                        <p class="text-white mx-3 mt-3">Сортувати:</p>
-                        <div class="form-check text-white mx-3">
-                            <input class="form-check-input" type="radio" name="order_by" id="flexRadioDefault1" value="default"
-                            {% if request.GET.order_by or request.GET.order_by == 'default' %}checked{% endif %}>
-                            <label class="form-check-label" for="flexRadioDefault1">
-                                За замовчуванням
-                            </label>
-                        </div>
-                        <div class="form-check text-white mx-3">
-                            <input class="form-check-input" type="radio" name="order_by" id="flexRadioDefault2" value="price"{% if request.GET.order_by == 'price' %}checked{% endif %}>
-                            <label class="form-check-label" for="flexRadioDefault2">
-                                Від дешевих до дорогих
-                            </label>
-                        </div>
-                        <div class="form-check text-white mx-3">
-                            <input class="form-check-input" type="radio" name="order_by" id="flexRadioDefault3" value="-price"{% if request.GET.order_by == '-price' %}checked{% endif %}>
-                            <label class="form-check-label" for="flexRadioDefault3">
-                                Від дорогих до дешевих
-                            </label>
-                        </div>
-                        <button type="submit" class="btn btn-primary mx-3 mt-3">Застосувати</button>
-                    </form>
-                </div>
+        <div class="relative group inline-block z-30">
+    <button class="bg-white border border-zinc-200 px-6 py-2.5 rounded-xl shadow-sm hover:bg-zinc-50 transition flex items-center gap-2 font-medium">
+        <svg class="w-5 h-5 text-zinc-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path></svg>
+        Фільтри та сортування
+    </button>
 
-                {% for car in cars %}
-                <!-- Карта товару -->
-                <div class="col-lg-4 col-md-6 p-4">
-                    <div class="card border-primary rounded custom-shadow">
-                        {% if car.image %}
-                        	<img src="{{ car.image.url }}" class="card-img-top" alt="{{ car.name }}">
-                        {% else %}
-                            <img src="{% static 'deps/images/Not found image.png' %}" class="card-img-top" alt="Незнайдено зображення">
+        <div class="absolute right-0 top-full w-80 pt-2 hidden group-hover:block hover:block">
+            <div class="bg-white rounded-2xl shadow-xl border border-zinc-100 p-5">
+                <form action="{% if request.GET.q %}{% url 'catalog:search' %}{% else %}{% url 'catalog:index' slug_url %}{% endif %}" method="get" class="space-y-4">
+
+                    <div class="flex items-center gap-3 p-3 bg-red-50 rounded-xl hover:bg-red-100 transition cursor-pointer" onclick="document.getElementById('onSaleCheck').click()">
+                        <input class="w-5 h-5 text-red-600 rounded focus:ring-red-500 border-gray-300" type="checkbox" name="on_sale" id="onSaleCheck" value="on" {% if request.GET.on_sale == 'on' %}checked{% endif %} onclick="event.stopPropagation()">
+                        {% if request.GET.q %}
+                            <input type="hidden" name="q" value="{{ request.GET.q }}">
                         {% endif %}
-                        <div class="card-body">
-                            <a href="{% url 'catalog:car' car.slug %}">
-                                <p class="card-title">{{ car.name }}</p>
-                            </a>
-                            <p class="card-text ">{{ car.description|truncatechars:60 }}</p>
-                            <p class="product_id">id:{{ car.displey_id }}</p>
-                            <div class="d-flex justify-content-between">
-                                {% if car.discount %}
-                                    <p><s>{{ car.price }}</s> $</p>
-                                    <p><strong>{{ car.price_for_sell }} $</strong></p>
-                                    <span class="badge bg-warning text-dark">Знижка {{ car.discount }} %</span>
-                                {%  else %}
-                                    <p><strong>{{ car.price }} $</strong></p>
-                                {% endif %}
-                                <a href="{% url 'carts:carts_add' %}" class="btn add-to-cart"
-                                data-car-id="{{ car.id }}">
-                                    {% csrf_token %}
-                                    <img class="mx-1" src="{% static 'deps/icons/cart-plus.svg' %}" alt="Іконка кошика"
-                                        width="32" height="32">
-                                </a>
-                            </div>
-                        </div>
+                        <label class="text-sm font-bold text-red-700 cursor-pointer w-full select-none" for="onSaleCheck">
+                            🔥 Тільки зі знижкою
+                        </label>
                     </div>
-                </div>
-                {% endfor %}
+
+                    <div class="space-y-3">
+                        <p class="text-xs font-bold text-zinc-400 uppercase tracking-wider">Сортувати за ціною:</p>
+
+                        <label class="flex items-center gap-3 p-2 rounded-lg hover:bg-zinc-50 cursor-pointer transition">
+                            <input type="radio" name="order_by" value="default" {% if not request.GET.order_by or request.GET.order_by == 'default' %}checked{% endif %} class="w-4 h-4 text-zinc-900 border-gray-300 focus:ring-zinc-900">
+                            <span class="text-sm font-medium text-zinc-700">За популярністю</span>
+                        </label>
+
+                        <label class="flex items-center gap-3 p-2 rounded-lg hover:bg-zinc-50 cursor-pointer transition">
+                            <input type="radio" name="order_by" value="price" {% if request.GET.order_by == 'price' %}checked{% endif %} class="w-4 h-4 text-zinc-900 border-gray-300 focus:ring-zinc-900">
+                            <span class="text-sm font-medium text-zinc-700">💰 Від дешевих</span>
+                        </label>
+
+                        <label class="flex items-center gap-3 p-2 rounded-lg hover:bg-zinc-50 cursor-pointer transition">
+                            <input type="radio" name="order_by" value="-price" {% if request.GET.order_by == '-price' %}checked{% endif %} class="w-4 h-4 text-zinc-900 border-gray-300 focus:ring-zinc-900">
+                            <span class="text-sm font-medium text-zinc-700">💎 Від дорогих</span>
+                        </label>
+                    </div>
+
+                    <button type="submit" class="w-full bg-zinc-900 text-white py-3 rounded-xl font-bold hover:bg-zinc-800 transition shadow-lg mt-2">
+                        Застосувати
+                    </button>
+                </form>
             </div>
-            <!-- Пагінація -->
-            <nav aria-label="Page navigation example">
-                <ul class="pagination justify-content-center my-4">
-                    <div class="custom-shadow d-flex">
-                        <li class="page-item {% if not page_obj.has_previous %} disabled {% endif %}">
-                            <a class="page-link" href='{% if page_obj.has_previous %}?{%  change_params page=page_obj.previous_page_number %}{% else %}
-
-                            {% endif %}'>Попередня</a>
-                        </li>
-                        
-                        {% for page in page_obj.paginator.page_range %}
-                            {% if page >= page_obj.number|add:-2 and page <= page_obj.number|add:2 %}
-                            	<li class="page-item" {% if page_obj.number == page %} active{% endif %}>
-                                    <a class="page-link" href="?{%  change_params page=page %}">{{ page }}</a>
-                             </li>
-                            {% endif %}
-                        {% endfor %}
-
-                        <li class="page-item {% if not page_obj.has_next %} disabled {% endif %}">
-                            <a class="page-link" href='{% if page_obj.has_next %}?{%  change_params page=page_obj.next_page_number %}{% else %}
-
-                            {% endif %}'>Наступна</a>
-
-                        </li>
-                    </div>
-                </ul>
-            </nav>
         </div>
     </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
+        {% for car in cars %}
+        <div class="group bg-white rounded-3xl overflow-hidden shadow-sm border border-zinc-100 hover:shadow-2xl transition-all duration-500 flex flex-col relative">
+
+            <div class="relative overflow-hidden h-64 bg-zinc-100 flex items-center justify-center">
+                {% if car.image %}
+                    <img src="{{ car.image.url }}" class="w-full h-full object-cover transition duration-700 group-hover:scale-110" alt="{{ car.name }}">
+                {% else %}
+                    <span class="text-4xl">🚙</span>
+                {% endif %}
+
+                {% if car.discount %}
+                    <div class="absolute top-4 left-0 bg-gradient-to-r from-yellow-400 to-orange-500 text-zinc-900 text-xs font-black px-4 py-1.5 rounded-r-full shadow-lg z-10">
+                        -{{ car.discount|floatformat:0 }}%
+                    </div>
+                {% endif %}
+
+                <button class="absolute top-3 right-3 p-2.5 bg-white/80 backdrop-blur rounded-full shadow-lg hover:bg-white transition add-to-favorites group/btn z-20"
+                        data-car-id="{{ car.id }}"
+                        data-url="{% url 'users:toggle_favorite' %}">
+                    {% is_in_favorites car.id as is_fav %}
+                    <svg class="w-5 h-5 transition-colors {% if is_fav %}text-red-500 fill-current{% else %}text-gray-400 group-hover/btn:text-red-500{% endif %}"
+                         fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
+                    </svg>
+                </button>
+            </div>
+
+            <div class="p-6 flex flex-col flex-grow">
+                <h5 class="text-xl font-bold text-zinc-900 mb-2 group-hover:text-blue-600 transition">
+                    <a href="{% url 'catalog:car' car.slug %}">{{ car.name }}</a>
+                </h5>
+                <p class="text-zinc-500 text-sm mb-6 line-clamp-2">{{ car.description|truncatechars:100 }}</p>
+
+                <div class="grid grid-cols-3 gap-2 mb-6 border-t border-zinc-50 pt-4">
+                    <div class="text-center">
+                        <span class="block text-xs text-zinc-400 uppercase mb-1">Трансмісія</span>
+                        <span class="text-xs font-bold text-zinc-700">{{ car.get_transmission_display_ua|title }}</span>
+                    </div>
+                    <div class="text-center border-x border-zinc-100">
+                        <span class="block text-xs text-zinc-400 uppercase mb-1">Витрати</span>
+                        <span class="text-xs font-bold text-zinc-700">{{ car.fuel_consumption|default:"—" }}</span>
+                    </div>
+                    <div class="text-center">
+                        <span class="block text-xs text-zinc-400 uppercase mb-1">Місць</span>
+                        <span class="text-xs font-bold text-zinc-700">{{ car.seats }}</span>
+                    </div>
+                </div>
+
+                <div class="mt-auto flex items-center justify-between">
+                    <div>
+                        {% if car.discount %}
+                            <span class="text-xs text-zinc-400 line-through block">${{ car.price }}</span>
+                            <span class="text-xl font-black text-zinc-900">${{ car.price_for_sell }}<span class="text-xs font-medium text-zinc-500">/день</span></span>
+                        {% else %}
+                            <span class="text-xl font-black text-zinc-900">${{ car.price }}<span class="text-xs font-medium text-zinc-500">/день</span></span>
+                        {% endif %}
+                    </div>
+
+                    <div class="flex gap-2">
+                        <a href="{% url 'carts:carts_add' %}"
+                           class="add-to-cart p-3 bg-zinc-50 hover:bg-zinc-900 hover:text-white rounded-2xl transition duration-300 border border-zinc-100 shadow-sm"
+                           data-car-id="{{ car.id }}">
+                            {% csrf_token %}
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+                        </a>
+                        <a href="{% url 'catalog:car' car.slug %}" class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-2xl font-bold text-sm transition shadow-lg shadow-blue-200 flex items-center">
+                            Деталі
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    {% if page_obj.paginator.num_pages > 1 %}
+    <nav class="mt-16 flex justify-center">
+        <ul class="flex items-center gap-2">
+            {% if page_obj.has_previous %}
+                <li>
+                    <a class="p-3 bg-white border border-zinc-200 rounded-xl hover:bg-zinc-900 hover:text-white transition" href="?{% change_params page=page_obj.previous_page_number %}">
+                        &larr;
+                    </a>
+                </li>
+            {% endif %}
+
+            {% for page in page_obj.paginator.page_range %}
+                {% if page >= page_obj.number|add:-2 and page <= page_obj.number|add:2 %}
+                    <li>
+                        <a class="w-12 h-12 flex items-center justify-center rounded-xl font-bold transition {% if page_obj.number == page %}bg-blue-600 text-white shadow-lg shadow-blue-200{% else %}bg-white border border-zinc-200 hover:bg-zinc-50{% endif %}" href="?{% change_params page=page %}">
+                            {{ page }}
+                        </a>
+                    </li>
+                {% endif %}
+            {% endfor %}
+
+            {% if page_obj.has_next %}
+                <li>
+                    <a class="p-3 bg-white border border-zinc-200 rounded-xl hover:bg-zinc-900 hover:text-white transition" href="?{% change_params page=page_obj.next_page_number %}">
+                        &rarr;
+                    </a>
+                </li>
+            {% endif %}
+        </ul>
+    </nav>
+    {% endif %}
 </div>
 {% endblock %}
 
 {% block footer %}
-<footer class="py-4 bg-dark">
-    <div class="container">
-        <p class="m-0 text-center text-white">Copyright &copy; АвтоГармонія Рент. Всі права захищені</p>
+<footer class="py-12 bg-zinc-900 text-center text-zinc-500 text-sm border-t border-zinc-800 mt-auto">
+    <div class="max-w-7xl mx-auto px-4">
+        <p class="uppercase tracking-widest">&copy; 2026 Car Rental. Всі права захищені.</p>
     </div>
 </footer>
 {% endblock %}

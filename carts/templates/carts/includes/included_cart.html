@@ -1,60 +1,93 @@
 {% load static %}
 
+<div class="bg-white rounded-3xl shadow-xl border border-zinc-100 overflow-hidden">
+    <div class="bg-zinc-900 px-6 py-4">
+        <h5 class="text-white font-bold uppercase tracking-widest text-sm flex items-center gap-2">
+            <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path></svg>
+            Ваше замовлення
+        </h5>
+    </div>
 
-<div class="card mb-3 text-bg-light shadow-lg">
-    {% for cart in carts %}
-        <div class="card-header">
-                                            <h5 class="card-title">{{ cart.car.name }}</h5>
-                                        </div>
-                                        <ul class="list-group list-group-flush">
-                                            <li class="list-group-item">
-                                                <div class="row text-center">
-                                                    <div class="col p-0">
-                                                        <div class="input-group">
-                                                            <span class="input-group-btn">
-                                                                <button type="button" class="btn btn-dark btn-sm decrement"
-                                                                    data-cart-id="{{ cart.id }}" data-cart-change-url="{% url 'carts:carts_change' %}">
-                                                                    {% csrf_token %}
-                                                                    -</button>
-                                                            </span>
-                                                            <input type="text" class="form-control number" value="{{ cart.period }}"
-                                                                readonly>
-                                                            <span class="input-group-btn">
-                                                                <button type="button" class="btn btn-dark btn-sm increment"
-                                                                    data-cart-id="{{ cart.id }}" data-cart-change-url="{% url 'carts:carts_change' %}">
-                                                                    {% csrf_token %}
-                                                                    +</button>
-                                                            </span>
-                                                        </div>
-                                                    </div>
-                                                    <div class="col p-0">
-                                                        <p>x {{ cart.car.price_for_sell }} = </p>
-                                                    </div>
-                                                    <div class="col p-0"><strong>{{cart.cars_price}} ₴</strong></div>
-                                                    <div class="col p-0">
-                                                        <a href="{% url 'carts:carts_remove'%}" class="remove-from-cart"
-                                                           data-cart-id="{{ cart.id }}">
-                                                            {% csrf_token %}
-                                                            <img class="mx-1" src="{% static "deps/icons/trash3-fill.svg" %}"
-                                                                alt="Іконка видалення" width="16" height="16">
-                                                        </a>
-                                                    </div>
-                                                </div>
-                                            </li>
-                                        </ul>
-    {% endfor %}
-    
+    <div class="p-0">
+        <div class="hidden md:flex bg-zinc-50 border-b border-zinc-100 py-3 px-6">
+            <div class="w-2/5 text-xs font-black text-zinc-400 uppercase">Автомобіль</div>
+            <div class="w-1/5 text-center text-xs font-black text-zinc-400 uppercase">Період (дні)</div>
+            <div class="w-1/5 text-center text-xs font-black text-zinc-400 uppercase">Ціна/день</div>
+            <div class="w-1/5 text-right text-xs font-black text-zinc-400 uppercase">Вартість</div>
+            <div class="w-10"></div>
+        </div>
 
-                                    </div>
-                                    <div class="card mb-3 shadow-lg">
-                                        <div class="card-footer">
-                                            <p class="float-left"><strong>{{ carts.total_period }}</strong> днів оренди машини на суму</p>
-                                            <h4 class="float-left"><strong>{{ carts.total_price }} ₴</strong></h4>
-                                        </div>
-                                    </div>
+        <div class="divide-y divide-zinc-100">
+            {% for cart in carts %}
+            <div class="flex flex-col md:flex-row items-center py-5 px-6 gap-4 hover:bg-zinc-50/50 transition">
+                <div class="w-full md:w-2/5">
+                    <h6 class="text-zinc-900 font-bold text-lg">{{ cart.car.name }}</h6>
+                </div>
 
-                                {% if carts and not order%}
-                                	<a class="btn btn-dark" href="{% url 'orders:create_order' %}">
-                                    Оформити бронювання
-                                </a>
-                                {% endif %}
+                <div class="w-full md:w-1/5 flex justify-center">
+                    <div class="flex items-center bg-white border border-zinc-200 rounded-xl overflow-hidden shadow-sm h-10 w-32">
+
+                        <button type="button" class="decrement-btn px-3 h-full hover:bg-zinc-100 text-zinc-500 transition font-bold text-lg"
+                                data-cart-id="{{ cart.id }}"
+                                data-cart-change-url="{% url 'carts:carts_change' %}">
+                            &minus;
+                        </button>
+
+                        <input type="number" class="cart-qty-input w-full h-full text-center font-bold text-zinc-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20 text-sm"
+                               value="{{ cart.period }}"
+                               min="1"
+                               data-cart-id="{{ cart.id }}"
+                               data-cart-change-url="{% url 'carts:carts_change' %}">
+
+                        <button type="button" class="increment-btn px-3 h-full hover:bg-zinc-100 text-zinc-500 transition font-bold text-lg"
+                                data-cart-id="{{ cart.id }}"
+                                data-cart-change-url="{% url 'carts:carts_change' %}">
+                            &plus;
+                        </button>
+                    </div>
+                </div>
+
+                <div class="w-full md:w-1/5 text-center">
+                    <span class="text-zinc-500 text-sm md:hidden uppercase mr-2 font-bold">За день:</span>
+                    <span class="font-medium text-zinc-600">${{ cart.car.price_for_sell }}</span>
+                </div>
+
+                <div class="w-full md:w-1/5 text-center md:text-right">
+                    <span class="text-zinc-500 text-sm md:hidden uppercase mr-2 font-bold">Разом:</span>
+                    <strong class="text-xl text-blue-600 font-black cart-item-total-price">${{ cart.cars_price }}</strong>
+                </div>
+
+                <div class="flex justify-end w-full md:w-10">
+                    <a href="{% url 'carts:carts_remove' %}" class="remove-from-cart group p-2 rounded-xl hover:bg-red-50 transition"
+                       data-cart-id="{{ cart.id }}">
+                        {% csrf_token %}
+                        <svg class="w-5 h-5 text-zinc-400 group-hover:text-red-500 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                        </svg>
+                    </a>
+                </div>
+            </div>
+            {% empty %}
+            <div class="py-20 text-center">
+                <p class="text-zinc-400 font-medium">Ваш кошик поки що порожній</p>
+                <a href="{% url 'main:index' %}" class="mt-4 inline-block text-blue-600 font-bold hover:underline">Перейти до вибору авто</a>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    {% if carts %}
+    <div class="bg-zinc-50 p-6 md:p-8 border-t border-zinc-100">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-6">
+            <div class="space-y-1">
+                <p class="text-zinc-500 text-sm font-medium uppercase tracking-wider">Загальний термін оренди</p>
+                <p class="text-zinc-900 font-black text-2xl cart-total-quantity">{{ carts.total_quantity }} <span class="text-sm font-medium text-zinc-400">днів</span></p>
+            </div>
+            <div class="text-left md:text-right">
+                <p class="text-zinc-500 text-sm font-medium uppercase tracking-wider mb-1">Разом до сплати</p>
+                <h4 class="text-4xl font-black text-zinc-900 tracking-tighter cart-total-price">${{ carts.total_price }}</h4>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
