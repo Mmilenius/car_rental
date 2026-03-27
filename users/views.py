@@ -11,7 +11,8 @@ from users.models import Favorite
 from cars.models import Cars
 from carts.models import Cart
 from orders.models import Order, OrderItem
-from users.forms import UserLoginForm, UserRegistationForm, ProfileForm
+from users.models import FineNotification, IncidentReport
+from users.forms import UserLoginForm, UserRegistationForm, ProfileForm, IncidentReportForm
 from common.mixins import CacheMixin
 
 
@@ -61,64 +62,46 @@ class UserRegistrationView(FormView):
 class ProfileView(View, CacheMixin):
     template_name = 'users/profile.html'
 
-    def get(self, request):
-        form = ProfileForm(instance=request.user)
-
-        # формуємо queryset
+    def get_context_data(self, request, profile_form=None, incident_form=None):
+        # Виносимо контекст в окремий метод, щоб не дублювати код
         orders = Order.objects.filter(user=request.user).prefetch_related(
-            Prefetch(
-                "orderitem_set",
-                queryset=OrderItem.objects.select_related("car"),
-            )
+            Prefetch("orderitem_set", queryset=OrderItem.objects.select_related("car"))
         ).order_by("-id")
 
-        # підставляємо в кеш
-        orders = self.set_get_cache(
-            query=orders,
-            cache_name=f"user_{request.user.id}_orders",
-            cache_time=60 * 5
-        )
+        fines = FineNotification.objects.filter(user=request.user).order_by('-issued_date')
+        incidents = IncidentReport.objects.filter(user=request.user).order_by('-created_timestamp')
 
-        context = {
+        return {
             'title': 'Home - Профіль',
-            'form': form,
+            'form': profile_form or ProfileForm(instance=request.user),
+            'incident_form': incident_form or IncidentReportForm(user=request.user),
             'orders': orders,
+            'fines': fines,
+            'incidents': incidents,
         }
-        return render(request, self.template_name, context)
+
+    def get(self, request):
+        return render(request, self.template_name, self.get_context_data(request))
 
     def post(self, request):
-        form = ProfileForm(data=request.POST, instance=request.user, files=request.FILES)
-        if form.is_valid():
-            form.save()
-            messages.success(request, 'Профіль успішно оновлений')
+        # Визначаємо, яку саме форму відправили (по імені кнопки)
+        if 'update_profile' in request.POST:
+            form = ProfileForm(data=request.POST, instance=request.user, files=request.FILES)
+            if form.is_valid():
+                form.save()
+                messages.success(request, 'Профіль успішно оновлений')
+                return redirect(reverse('users:profile'))
+            return render(request, self.template_name, self.get_context_data(request, profile_form=form))
 
-            # очищаємо кеш після оновлення профілю
-            cache.delete(f"user_{request.user.id}_orders")
-
-            return redirect(reverse('users:profile'))
-
-        # знову формуємо queryset
-        orders = Order.objects.filter(user=request.user).prefetch_related(
-            Prefetch(
-                "orderitem_set",
-                queryset=OrderItem.objects.select_related("car"),
-            )
-        ).order_by("-id")
-
-        # і підставляємо в кеш
-        orders = self.set_get_cache(
-            query=orders,
-            cache_name=f"user_{request.user.id}_orders",
-            cache_time=60 * 5
-        )
-
-        context = {
-            'title': 'Home - Профіль',
-            'form': form,
-            'orders': orders,
-        }
-        return render(request, self.template_name, context)
-
+        elif 'submit_incident' in request.POST:
+            incident_form = IncidentReportForm(user=request.user, data=request.POST, files=request.FILES)
+            if incident_form.is_valid():
+                incident = incident_form.save(commit=False)
+                incident.user = request.user
+                incident.save()
+                messages.success(request, 'Ваш звіт успішно відправлено. Менеджер зв\'яжеться з вами найближчим часом.')
+                return redirect(reverse('users:profile'))
+            return render(request, self.template_name, self.get_context_data(request, incident_form=incident_form))
 
 class UsersCartView(TemplateView):
     template_name = 'users/users_cart.html'

@@ -2,7 +2,7 @@ from django import forms
 from django.contrib.auth.forms import UserChangeForm
 from allauth.account.forms import LoginForm, SignupForm
 from users.models import User
-
+from .models import IncidentReport
 
 class UserLoginForm(LoginForm):
     login = forms.CharField(
@@ -106,3 +106,15 @@ class ProfileForm(UserChangeForm):
     last_name = forms.CharField()
     username = forms.CharField()
     email = forms.CharField()
+
+
+class IncidentReportForm(forms.ModelForm):
+    class Meta:
+        model = IncidentReport
+        fields = ['order', 'incident_type', 'description', 'photo']
+
+    def __init__(self, user, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Фільтруємо замовлення, щоб користувач міг вибрати лише свої
+        from orders.models import Order
+        self.fields['order'].queryset = Order.objects.filter(user=user).order_by('-id')

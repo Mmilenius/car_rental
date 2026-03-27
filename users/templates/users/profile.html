@@ -5,153 +5,289 @@
 
 {% block content %}
 {% user_carts request as carts %}
-<div class="max-w-7xl mx-auto py-10 px-4">
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+<div class="max-w-7xl mx-auto py-10 px-4 space-y-8">
 
-        <div class="lg:col-span-5 space-y-8">
-            <div class="bg-white rounded-3xl shadow-xl border border-zinc-100 p-8">
-                <h3 class="text-2xl font-black text-zinc-900 mb-6 text-center">Профіль користувача</h3>
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
 
-                <form action="{% url 'users:profile' %}" method="post" enctype="multipart/form-data" class="space-y-5">
-                    {% csrf_token %}
+        <div class="bg-white rounded-3xl shadow-xl border border-zinc-100 p-8 h-full">
+            <h3 class="text-xl font-black text-zinc-900 mb-6 text-center">Особисті дані</h3>
 
-                    <div class="flex flex-col items-center mb-6">
-                        <div class="w-32 h-32 rounded-full overflow-hidden border-4 border-zinc-100 shadow-sm mb-4 relative group">
-                            {% if user.image %}
-                                <img src="{{ user.image.url }}" alt="Avatar" class="w-full h-full object-cover">
-                            {% else %}
-                                <img src="{% static 'deps/images/baseavatar.jpg' %}" alt="Avatar" class="w-full h-full object-cover">
-                            {% endif %}
+            <form action="{% url 'users:profile' %}" method="post" enctype="multipart/form-data" class="space-y-5">
+                {% csrf_token %}
 
-                            <label for="id_image" class="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition cursor-pointer text-white text-xs font-bold">
-                                Змінити
-                            </label>
-                        </div>
-                        <input type="file" name="image" id="id_image" accept="image/*" class="hidden">
-                        {% if form.image.errors %}<div class="text-red-500 text-xs">{{ form.image.errors }}</div>{% endif %}
+                <div class="flex flex-col items-center mb-6">
+                    <div class="w-32 h-32 rounded-full overflow-hidden border-4 border-zinc-100 shadow-sm mb-4 relative group">
+                        {% if user.image %}
+                            <img src="{{ user.image.url }}" alt="Avatar" class="w-full h-full object-cover">
+                        {% else %}
+                            <img src="{% static 'deps/images/baseavatar.jpg' %}" alt="Avatar" class="w-full h-full object-cover">
+                        {% endif %}
+
+                        <label for="id_image" class="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition cursor-pointer text-white text-xs font-bold">
+                            Змінити
+                        </label>
                     </div>
+                    <input type="file" name="image" id="id_image" accept="image/*" class="hidden">
+                    {% if form.image.errors %}<div class="text-red-500 text-xs">{{ form.image.errors }}</div>{% endif %}
+                </div>
 
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                            <label for="id_first_name" class="block text-xs font-bold text-zinc-500 uppercase mb-1">Ім’я</label>
-                            <input type="text" name="first_name" id="id_first_name" value="{{ form.first_name.value }}" required
-                                   class="w-full bg-zinc-50 border border-zinc-200 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none transition">
-                        </div>
-                        <div>
-                            <label for="id_last_name" class="block text-xs font-bold text-zinc-500 uppercase mb-1">Прізвище</label>
-                            <input type="text" name="last_name" id="id_last_name" value="{{ form.last_name.value }}" required
-                                   class="w-full bg-zinc-50 border border-zinc-200 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none transition">
-                        </div>
-                    </div>
-
+                <div class="grid grid-cols-2 gap-4">
                     <div>
-                        <label for="id_username" class="block text-xs font-bold text-zinc-500 uppercase mb-1">Логін</label>
-                        <input type="text" name="username" id="id_username" value="{{ form.username.value }}" required
+                        <label class="block text-[10px] font-bold text-zinc-500 uppercase mb-1">Ім’я</label>
+                        <input type="text" name="first_name" value="{{ form.first_name.value|default:'' }}" required
                                class="w-full bg-zinc-50 border border-zinc-200 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none transition">
                     </div>
-
                     <div>
-                        <label for="id_email" class="block text-xs font-bold text-zinc-500 uppercase mb-1">Email</label>
-                        <input type="email" name="email" id="id_email" value="{{ form.email.value }}" required
+                        <label class="block text-[10px] font-bold text-zinc-500 uppercase mb-1">Прізвище</label>
+                        <input type="text" name="last_name" value="{{ form.last_name.value|default:'' }}" required
                                class="w-full bg-zinc-50 border border-zinc-200 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none transition">
                     </div>
+                </div>
 
-                    <button type="submit" class="w-full bg-zinc-900 text-white font-bold py-3 rounded-xl hover:bg-zinc-800 transition shadow-lg">
-                        Зберегти зміни
-                    </button>
-                </form>
+                <div>
+                    <label class="block text-[10px] font-bold text-zinc-500 uppercase mb-1">Логін</label>
+                    <input type="text" name="username" value="{{ form.username.value|default:'' }}" required
+                           class="w-full bg-zinc-50 border border-zinc-200 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none transition">
+                </div>
+
+                <div>
+                    <label class="block text-[10px] font-bold text-zinc-500 uppercase mb-1">Email</label>
+                    <input type="email" name="email" value="{{ form.email.value|default:'' }}" required
+                           class="w-full bg-zinc-50 border border-zinc-200 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none transition">
+                </div>
+
+                <button type="submit" name="update_profile" class="w-full bg-zinc-900 text-white font-bold py-3 rounded-xl hover:bg-zinc-800 transition shadow-lg mt-2">
+                    Зберегти зміни
+                </button>
+            </form>
+        </div>
+
+        <div class="bg-white rounded-3xl shadow-sm border border-zinc-100 overflow-hidden h-full flex flex-col">
+            <div class="bg-zinc-50 px-6 py-4 border-b border-zinc-100 shrink-0">
+                <h3 class="font-bold text-zinc-900 flex items-center gap-2 text-sm">
+                    <svg class="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+                    Поточний кошик
+                </h3>
+            </div>
+            <div class="p-0 flex-grow">
+                {% include 'carts/includes/included_cart.html' %}
             </div>
         </div>
 
-        <div class="lg:col-span-7 space-y-8">
+    </div>
 
-            <div class="bg-white rounded-3xl shadow-sm border border-zinc-100 overflow-hidden">
-                <div class="bg-zinc-50 px-6 py-4 border-b border-zinc-100">
-                    <h3 class="font-bold text-zinc-900 flex items-center gap-2">
-                        <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
-                        Ваш кошик
-                    </h3>
-                </div>
-                <div class="p-0">
-                    {% include 'carts/includes/included_cart.html' %}
-                </div>
+    <div class="w-full">
+        <div class="bg-white rounded-3xl shadow-sm border border-zinc-100 overflow-hidden min-h-[500px]">
+
+            <div class="flex border-b border-zinc-100 px-2 pt-2 bg-zinc-50/50 overflow-x-auto custom-scrollbar">
+                <button onclick="openTab('orders')" id="btn-orders" class="tab-btn active-tab flex-shrink-0 px-6 py-4 text-sm font-bold border-b-2 border-blue-600 text-blue-600 transition">
+                    📦 Мої замовлення
+                </button>
+                <button onclick="openTab('fines')" id="btn-fines" class="tab-btn flex-shrink-0 px-6 py-4 text-sm font-bold border-b-2 border-transparent text-zinc-500 hover:text-zinc-800 transition relative">
+                    🚨 Штрафи
+                    {% if fines %}
+                        <span class="absolute top-2 right-2 flex h-3 w-3"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span><span class="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span></span>
+                    {% endif %}
+                </button>
+                <button onclick="openTab('support')" id="btn-support" class="tab-btn flex-shrink-0 px-6 py-4 text-sm font-bold border-b-2 border-transparent text-zinc-500 hover:text-zinc-800 transition">
+                    🛠️ Повідомити про ДТП / Поломку
+                </button>
             </div>
 
-            <div class="bg-white rounded-3xl shadow-sm border border-zinc-100 overflow-hidden">
-                <div class="bg-zinc-900 text-white px-6 py-8 text-center">
-                    <h3 class="text-2xl font-bold mb-1">Мої замовлення</h3>
-                    <p class="text-zinc-400 text-sm">Історія та статус бронювань</p>
-                </div>
+            <div class="p-6 md:p-8">
 
-                <div class="p-6 space-y-4">
+                <div id="content-orders" class="tab-content block space-y-4">
+                    <h2 class="text-2xl font-black text-zinc-900 mb-6">Історія бронювань</h2>
                     {% for order in orders %}
-                    <details class="group bg-zinc-50 rounded-2xl border border-zinc-200 overflow-hidden transition-all duration-300 [&[open]]:bg-white [&[open]]:shadow-md" {% if forloop.first %}open{% endif %}>
-                        <summary class="flex items-center justify-between px-6 py-4 cursor-pointer select-none list-none">
-                            <div class="flex flex-col md:flex-row md:items-center gap-2 md:gap-6">
+                    <details class="group bg-white rounded-2xl border border-zinc-200 overflow-hidden transition-all duration-300 [&[open]]:shadow-md" {% if forloop.first %}open{% endif %}>
+                        <summary class="flex items-center justify-between px-6 py-4 cursor-pointer select-none list-none bg-zinc-50/50 hover:bg-zinc-50">
+                            <div class="flex items-center gap-4 md:gap-6">
                                 <div>
-                                    <span class="block text-xs text-zinc-400 font-bold uppercase">Замовлення</span>
+                                    <span class="block text-[10px] text-zinc-400 font-bold uppercase">Замовлення</span>
                                     <span class="font-bold text-zinc-900">#{{ order.id }}</span>
                                 </div>
-                                <div class="hidden md:block w-px h-8 bg-zinc-200"></div>
+                                <div class="w-px h-8 bg-zinc-200"></div>
                                 <div>
-                                    <span class="block text-xs text-zinc-400 font-bold uppercase">Дата</span>
+                                    <span class="block text-[10px] text-zinc-400 font-bold uppercase">Дата</span>
                                     <span class="text-sm text-zinc-700">{{ order.created_timestamp|date:"d.m.Y" }}</span>
                                 </div>
                             </div>
-
-                            <div class="flex items-center gap-4">
-                                {% if order.status == 'Опрацьовується' %}
-                                    <span class="px-3 py-1 bg-yellow-100 text-yellow-800 rounded-full text-xs font-bold border border-yellow-200">{{ order.status }}</span>
-                                {% elif order.status == 'Підтверджено' %}
-                                    <span class="px-3 py-1 bg-green-100 text-green-800 rounded-full text-xs font-bold border border-green-200">{{ order.status }}</span>
-                                {% elif order.status == 'Виконано' %}
-                                    <span class="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-xs font-bold border border-blue-200">{{ order.status }}</span>
-                                {% else %}
-                                    <span class="px-3 py-1 bg-gray-100 text-gray-800 rounded-full text-xs font-bold border border-gray-200">{{ order.status }}</span>
-                                {% endif %}
-
-                                <svg class="w-5 h-5 text-zinc-400 transform group-open:rotate-180 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                            <div class="flex items-center gap-3">
+                                <span class="px-3 py-1 rounded-full text-[10px] font-bold border
+                                    {% if order.status == 'Опрацьовується' %}bg-yellow-100 text-yellow-800 border-yellow-200
+                                    {% elif order.status == 'Підтверджено' %}bg-green-100 text-green-800 border-green-200
+                                    {% elif order.status == 'Виконано' %}bg-blue-100 text-blue-800 border-blue-200
+                                    {% else %}bg-gray-100 text-gray-800 border-gray-200{% endif %}">
+                                    {{ order.status }}
+                                </span>
+                                <svg class="w-5 h-5 text-zinc-400 transform group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                             </div>
                         </summary>
-
                         <div class="border-t border-zinc-100 px-6 py-4">
-                            <div class="overflow-x-auto">
-                                <table class="w-full text-left">
-                                    <thead>
-                                        <tr class="text-xs text-zinc-400 uppercase border-b border-zinc-200">
-                                            <th class="pb-2">Автомобіль</th>
-                                            <th class="pb-2 text-center">Термін</th>
-                                            <th class="pb-2 text-center">Ціна/день</th>
-                                            <th class="pb-2 text-right">Сума</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody class="text-sm">
-                                        {% for item in order.orderitem_set.all %}
-                                        <tr class="border-b border-zinc-50 last:border-0">
-                                            <td class="py-3 font-medium text-zinc-900">
-                                                <a href="{% url 'catalog:car' item.car.slug %}" class="hover:text-blue-600 transition">{{ item.car.name }}</a>
-                                            </td>
-                                            <td class="py-3 text-center text-zinc-500">{{ item.period }} дн.</td>
-                                            <td class="py-3 text-center font-bold text-zinc-700">${{ item.price }}</td>
-                                            <td class="py-3 text-right font-black text-zinc-900">${{ item.total_price }}</td>
-                                        </tr>
-                                        {% endfor %}
-                                    </tbody>
-                                </table>
-                            </div>
+                            <table class="w-full text-left">
+                                <tbody class="text-sm">
+                                    {% for item in order.orderitem_set.all %}
+                                    <tr class="border-b border-zinc-50 last:border-0">
+                                        <td class="py-3 font-medium text-zinc-900"><a href="{% url 'catalog:car' item.car.slug %}" class="hover:text-blue-600">{{ item.car.name }}</a></td>
+                                        <td class="py-3 text-center text-zinc-500">{{ item.period }} дн.</td>
+                                        <td class="py-3 text-right font-black text-zinc-900">${{ item.total_price }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
                         </div>
                     </details>
                     {% empty %}
-                    <div class="text-center py-10 bg-zinc-50 rounded-2xl border border-dashed border-zinc-300">
-                        <svg class="w-12 h-12 text-zinc-300 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
-                        <h4 class="text-zinc-900 font-bold">Історія порожня</h4>
-                        <p class="text-zinc-500 text-sm mb-4">Ви ще не робили замовлень</p>
-                        <a href="{% url 'main:index' %}" class="inline-block bg-zinc-900 text-white px-6 py-2 rounded-full text-sm font-bold hover:bg-zinc-800 transition">До каталогу</a>
+                    <div class="text-center py-12 bg-zinc-50 rounded-2xl border border-dashed border-zinc-300">
+                        <span class="text-4xl block mb-3 opacity-50">🛒</span>
+                        <h4 class="text-zinc-900 font-bold">Ви ще не робили замовлень</h4>
+                        <a href="{% url 'main:index' %}" class="mt-4 inline-block bg-blue-600 text-white px-6 py-2 rounded-xl text-sm font-bold hover:bg-blue-700">До каталогу</a>
                     </div>
                     {% endfor %}
                 </div>
+
+                <div id="content-fines" class="tab-content hidden space-y-4">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-2xl font-black text-zinc-900">Мої штрафи</h2>
+                        <span class="bg-red-100 text-red-700 px-3 py-1 rounded-lg text-sm font-bold">Всього: {{ fines|length }}</span>
+                    </div>
+
+                    {% if fines %}
+                        <div class="grid gap-4">
+                            {% for fine in fines %}
+                            <div class="flex flex-col md:flex-row md:items-center justify-between p-5 bg-white border {% if not fine.is_paid %}border-red-200 shadow-sm shadow-red-100{% else %}border-green-200 opacity-75{% endif %} rounded-2xl">
+                                <div>
+                                    <div class="flex items-center gap-2 mb-1">
+                                        <span class="font-black text-lg text-zinc-900">{{ fine.car.name }}</span>
+                                        {% if not fine.is_paid %}
+                                            <span class="bg-red-500 text-white text-[10px] px-2 py-0.5 rounded-full font-bold uppercase">Неоплачено</span>
+                                        {% else %}
+                                            <span class="bg-green-500 text-white text-[10px] px-2 py-0.5 rounded-full font-bold uppercase">Оплачено</span>
+                                        {% endif %}
+                                    </div>
+                                    <p class="text-sm text-zinc-600">{{ fine.reason }}</p>
+                                    <p class="text-[10px] text-zinc-400 mt-2 font-bold uppercase">Виписано: {{ fine.issued_date|date:"d.m.Y" }}</p>
+                                </div>
+                                <div class="mt-4 md:mt-0 text-left md:text-right">
+                                    <p class="text-2xl font-black {% if not fine.is_paid %}text-red-600{% else %}text-green-600{% endif %}">₴{{ fine.amount }}</p>
+                                    {% if not fine.is_paid %}
+                                        <button class="mt-2 w-full md:w-auto px-6 py-2 bg-red-600 hover:bg-red-700 text-white text-xs font-bold rounded-xl transition">Оплатити онлайн</button>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="text-center py-12 bg-green-50 rounded-2xl border border-dashed border-green-200">
+                            <span class="text-4xl block mb-3">✅</span>
+                            <h4 class="text-green-800 font-bold">У вас немає жодних штрафів!</h4>
+                            <p class="text-green-600 text-sm mt-1">Дякуємо за безпечне водіння.</p>
+                        </div>
+                    {% endif %}
+                </div>
+
+                <div id="content-support" class="tab-content hidden">
+                    <div class="bg-zinc-900 rounded-2xl p-6 md:p-8 text-white mb-8 flex items-center justify-between">
+                        <div>
+                            <h2 class="text-2xl font-black mb-2">Сталася неприємність?</h2>
+                            <p class="text-zinc-400 text-sm">Опишіть проблему, додайте фото, і наш менеджер зв'яжеться з вами за кілька хвилин.</p>
+                        </div>
+                        <span class="text-5xl hidden md:block">🆘</span>
+                    </div>
+
+                    <form action="{% url 'users:profile' %}" method="post" enctype="multipart/form-data" class="space-y-5 bg-zinc-50 p-6 rounded-2xl border border-zinc-200">
+                        {% csrf_token %}
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-[10px] font-bold text-zinc-500 uppercase mb-1">Яке авто? (Замовлення)</label>
+                                <select name="order" required class="w-full bg-white border border-zinc-200 rounded-xl px-3 py-2.5 text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+                                    <option value="">-- Оберіть замовлення --</option>
+                                    {% for order in orders %}
+                                        <option value="{{ order.id }}">Замовлення #{{ order.id }} ({{ order.created_timestamp|date:"d.m.Y" }})</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-bold text-zinc-500 uppercase mb-1">Що сталося?</label>
+                                <select name="incident_type" required class="w-full bg-white border border-zinc-200 rounded-xl px-3 py-2.5 text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+                                    <option value="damage">Подряпина / Пошкодження авто</option>
+                                    <option value="dtp">ДТП (Аварія)</option>
+                                    <option value="breakdown">Технічна поломка (не заводиться і т.д.)</option>
+                                    <option value="other">Інша проблема</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-bold text-zinc-500 uppercase mb-1">Детальний опис</label>
+                            <textarea name="description" rows="3" required placeholder="Де ви знаходитесь? Що саме пошкоджено?" class="w-full bg-white border border-zinc-200 rounded-xl px-3 py-3 text-sm focus:ring-2 focus:ring-blue-500 outline-none resize-none"></textarea>
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-bold text-zinc-500 uppercase mb-1">Фото з місця події</label>
+                            <input type="file" name="photo" accept="image/*" class="w-full text-sm text-zinc-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-bold file:bg-zinc-200 file:text-zinc-700 hover:file:bg-zinc-300 transition cursor-pointer">
+                        </div>
+                        <button type="submit" name="submit_incident" class="w-full bg-blue-600 text-white font-bold py-3 rounded-xl hover:bg-blue-700 transition">Відправити звіт</button>
+                    </form>
+
+                    {% if incidents %}
+                    <div class="mt-10">
+                        <h3 class="text-lg font-black text-zinc-900 mb-4">Історія ваших звернень</h3>
+                        <div class="space-y-3">
+                            {% for incident in incidents %}
+                            <div class="flex justify-between items-center p-4 bg-white border border-zinc-100 shadow-sm rounded-xl text-sm">
+                                <div>
+                                    <span class="font-bold text-zinc-800 block mb-1">{{ incident.get_incident_type_display }}</span>
+                                    <span class="text-zinc-400 text-xs">{{ incident.created_timestamp|date:"d.m.Y H:i" }}</span>
+                                </div>
+                                <div class="text-right">
+                                    {% if incident.status == 'pending' %}
+                                        <span class="text-yellow-700 bg-yellow-100 border border-yellow-200 px-3 py-1 rounded-full text-xs font-bold">Очікує розгляду</span>
+                                    {% elif incident.status == 'processing' %}
+                                        <span class="text-blue-700 bg-blue-100 border border-blue-200 px-3 py-1 rounded-full text-xs font-bold">В роботі</span>
+                                    {% else %}
+                                        <span class="text-green-700 bg-green-100 border border-green-200 px-3 py-1 rounded-full text-xs font-bold">Вирішено</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+
             </div>
         </div>
     </div>
 </div>
+
+<script>
+    function openTab(tabName) {
+        // Ховаємо весь контент
+        document.querySelectorAll('.tab-content').forEach(el => {
+            el.classList.add('hidden');
+            el.classList.remove('block');
+        });
+
+        // Скидаємо стилі всіх кнопок
+        document.querySelectorAll('.tab-btn').forEach(el => {
+            el.classList.remove('active-tab', 'border-blue-600', 'text-blue-600');
+            el.classList.add('border-transparent', 'text-zinc-500');
+        });
+
+        // Показуємо потрібний контент
+        document.getElementById('content-' + tabName).classList.remove('hidden');
+        document.getElementById('content-' + tabName).classList.add('block');
+
+        // Робимо кнопку активною
+        let btn = document.getElementById('btn-' + tabName);
+        btn.classList.add('active-tab', 'border-blue-600', 'text-blue-600');
+        btn.classList.remove('border-transparent', 'text-zinc-500');
+    }
+
+    // Якщо ми відправляли форму з інцидентом, варто відразу відкрити вкладку "Підтримка" після перезавантаження
+    document.addEventListener("DOMContentLoaded", function() {
+        if (window.location.search.includes('tab=support')) {
+            openTab('support');
+        }
+    });
+</script>
 {% endblock %}
