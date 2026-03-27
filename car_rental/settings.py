@@ -9,8 +9,11 @@ https://docs.djangoproject.com/en/4.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.2/ref/settings/
 """
-
+import os
+from dotenv import load_dotenv
 from pathlib import Path
+
+load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -234,5 +237,5 @@ SOCIALACCOUNT_QUERY_EMAIL = True
 ALLAUTH_UI_THEME = "light"
 
 STRIPE_PUBLIC_KEY = 'pk_test_51S7Zr6GXClxGwxcBKE7TfkMQpMCjCT1v4XXcCJzTlOiXhxiLjG0uk6E4M2x9EoJgvgLO3Pm4uHhkzAyXh0v2lmhb00F6rKW3Uk'
-STRIPE_SECRET_KEY = ''
+STRIPE_SECRET_KEY = os.getenv('STRIPE_SECRET_KEY')
 STRIPE_WEBHOOK_SECRET = 'ваш_webhook_секрет'
