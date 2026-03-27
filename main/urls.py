@@ -24,4 +24,5 @@ app_name = 'main'
 urlpatterns = [
     path('', views.IndexView.as_view(), name='index'),
     path('about/', cache_page(60*5)(views.AboutView.as_view()), name='about'),
+    path('terms/', views.TermsView.as_view(), name='terms'),
 ]

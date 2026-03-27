@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto py-10">
+    <div class="mb-10 text-center">
+        <h1 class="text-4xl md:text-5xl font-black text-zinc-900 mb-4 tracking-tight">Умови <span class="text-blue-600">оренди</span></h1>
+        <p class="text-gray-500 text-lg">Основні правила та вимоги для прокату автомобілів</p>
+    </div>
+
+    <div class="bg-white rounded-3xl shadow-xl border border-gray-100 overflow-hidden">
+        <div class="p-8 md:p-12 space-y-10">
+            
+            <section>
+                <div class="flex items-center gap-3 mb-4">
+                    <div class="w-10 h-10 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center text-xl">👤</div>
+                    <h2 class="text-2xl font-bold text-zinc-900">Вимоги до водія</h2>
+                </div>
+                <ul class="space-y-3 text-gray-600 ml-13 pl-4 border-l-2 border-blue-100">
+                    <li><strong class="text-zinc-800">Мінімальний вік:</strong> 21 рік для стандартних авто, 25 років для преміум-класу.</li>
+                    <li><strong class="text-zinc-800">Стаж водіння:</strong> Не менше 2-х років.</li>
+                </ul>
+            </section>
+
+            <section>
+                <div class="flex items-center gap-3 mb-4">
+                    <div class="w-10 h-10 rounded-full bg-green-50 text-green-600 flex items-center justify-center text-xl">📄</div>
+                    <h2 class="text-2xl font-bold text-zinc-900">Необхідні документи</h2>
+                </div>
+                <ul class="space-y-3 text-gray-600 ml-13 pl-4 border-l-2 border-green-100">
+                    <li>Дійсний паспорт громадянина України (або закордонний паспорт).</li>
+                    <li>Ідентифікаційний код (ІПН).</li>
+                    <li>Дійсне посвідчення водія відповідної категорії.</li>
+                </ul>
+            </section>
+
+            <section>
+                <div class="flex items-center gap-3 mb-4">
+                    <div class="w-10 h-10 rounded-full bg-purple-50 text-purple-600 flex items-center justify-center text-xl">💳</div>
+                    <h2 class="text-2xl font-bold text-zinc-900">Оплата та застава</h2>
+                </div>
+                <ul class="space-y-3 text-gray-600 ml-13 pl-4 border-l-2 border-purple-100">
+                    <li>Оплата здійснюється наперед за весь період оренди.</li>
+                    <li><strong class="text-zinc-800">Застава (депозит):</strong> Обов'язкова для всіх авто. Сума залежить від класу автомобіля та блокується на кредитній картці.</li>
+                    <li>Приймаємо до оплати: Visa, MasterCard, готівка (за попередньою домовленістю).</li>
+                </ul>
+            </section>
+
+            <section>
+                <div class="flex items-center gap-3 mb-4">
+                    <div class="w-10 h-10 rounded-full bg-orange-50 text-orange-600 flex items-center justify-center text-xl">🛣️</div>
+                    <h2 class="text-2xl font-bold text-zinc-900">Ліміт пробігу та територія</h2>
+                </div>
+                <ul class="space-y-3 text-gray-600 ml-13 pl-4 border-l-2 border-orange-100">
+                    <li><strong class="text-zinc-800">Добовий ліміт:</strong> 250 км. Перевищення оплачується додатково (за тарифами конкретного авто).</li>
+                    <li>Виїзд за кордон дозволений лише за попереднім погодженням та з оформленням додаткових документів.</li>
+                </ul>
+            </section>
+
+        </div>
+    </div>
+</div>
+{% endblock %}

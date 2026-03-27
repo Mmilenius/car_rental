@@ -4,7 +4,7 @@ from django.views import View
 from carts.mixins import CartMixin
 from carts.models import Cart
 from cars.models import Cars
-from carts.utils import get_user_carts # Переконайтесь, що цей імпорт правильний для вашого проекту
+from carts.utils import get_user_carts
 
 class CartAddView(CartMixin, View):
     def post(self, request):
@@ -23,14 +23,15 @@ class CartAddView(CartMixin, View):
                 period=1
             )
 
-        # Отримуємо оновлений кошик для підрахунку кількості
+        # Отримуємо оновлений кошик
         user_cart = get_user_carts(request)
         cart_items_html = self.render_cart(request)
 
         return JsonResponse({
             "message": "Машина додана в кошик",
             "cart_items_html": cart_items_html,
-            "total_quantity": user_cart.total_quantity() if user_cart else 0,
+            # ВИПРАВЛЕНО: використовуємо total_period() замість total_quantity()
+            "total_quantity": user_cart.total_period() if user_cart else 0,
         })
 
 class CartChangeView(CartMixin, View):
@@ -49,7 +50,8 @@ class CartChangeView(CartMixin, View):
         return JsonResponse({
             "message": "Період оновлено",
             "cart_items_html": cart_items_html,
-            "total_quantity": user_cart.total_quantity() if user_cart else 0,
+            # ВИПРАВЛЕНО: використовуємо total_period()
+            "total_quantity": user_cart.total_period() if user_cart else 0,
         })
 
 class CartRemoveView(CartMixin, View):
@@ -64,5 +66,6 @@ class CartRemoveView(CartMixin, View):
         return JsonResponse({
             "message": "Машину видалено",
             "cart_items_html": cart_items_html,
-            "total_quantity": user_cart.total_quantity() if user_cart else 0,
+            # ВИПРАВЛЕНО: використовуємо total_period()
+            "total_quantity": user_cart.total_period() if user_cart else 0,
         })

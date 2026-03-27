@@ -16,6 +16,7 @@ class IndexView(TemplateView):
         context['title'] = 'Home - Головна'
         context['content'] = "Прокат автомобілі"
         context['categories'] = Categories.objects.all()
+        context['cars'] = Cars.objects.all().order_by('?')[:3]
         return context
 
 
@@ -29,10 +30,18 @@ class AboutView(TemplateView):
         return context
 
 
+class TermsView(TemplateView):
+    template_name = 'main/terms.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = 'Car Rental - Умови оренди'
+        return context
+
 def index(request):
     # Отримуємо 3 останні додані авто (або можна відсортувати за популярністю)
     # [:3] означає "взяти перші 3"
-    cars = Cars.objects.all().order_by('-id')[:3]
+    cars = Cars.objects.all().order_by('?')[:3]
 
     context = {
         'title': 'Car Rental - Головна',

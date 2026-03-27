@@ -1,3 +1,4 @@
+<div id="cart-items-container">
 {% load static %}
 
 <div class="bg-white rounded-3xl shadow-xl border border-zinc-100 overflow-hidden">
@@ -79,15 +80,18 @@
     {% if carts %}
     <div class="bg-zinc-50 p-6 md:p-8 border-t border-zinc-100">
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-6">
-            <div class="space-y-1">
-                <p class="text-zinc-500 text-sm font-medium uppercase tracking-wider">Загальний термін оренди</p>
-                <p class="text-zinc-900 font-black text-2xl cart-total-quantity">{{ carts.total_quantity }} <span class="text-sm font-medium text-zinc-400">днів</span></p>
-            </div>
             <div class="text-left md:text-right">
                 <p class="text-zinc-500 text-sm font-medium uppercase tracking-wider mb-1">Разом до сплати</p>
                 <h4 class="text-4xl font-black text-zinc-900 tracking-tighter cart-total-price">${{ carts.total_price }}</h4>
             </div>
         </div>
-    </div>
+
+        <div class="mt-6">
+            <a href="{% url 'orders:create_order' %}" class="w-full flex items-center justify-center bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-xl transition shadow-lg shadow-blue-500/30 text-lg uppercase tracking-wider">
+                Оформити замовлення
+            </a>
+        </div>
+        </div>
     {% endif %}
+</div>
 </div>
