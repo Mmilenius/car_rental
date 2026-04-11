@@ -1,0 +1,34 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:15
+    container_name: car_rental_db
+    environment:
+      POSTGRES_DB: car_rental_db
+      POSTGRES_USER: home
+      POSTGRES_PASSWORD: 1234
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+  web:
+    build: .
+    container_name: car_rental_web
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - .:/app
+    ports:
+      - "8000:8000"
+    environment:
+      - DB_NAME=car_rental_db
+      - DB_USER=home
+      - DB_PASSWORD=1234
+      - DB_HOST=db  # Це ключовий момент! Ім'я хоста - це ім'я сервісу вище.
+      - DB_PORT=5432
+    depends_on:
+      - db
+
+volumes:
+  postgres_data:

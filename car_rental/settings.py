@@ -108,12 +108,12 @@ WSGI_APPLICATION = 'car_rental.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'home',
-        'USER': 'home',
-        'PASSWORD': '1234',
-        'HOST': 'localhost',
-        'PORT': '5432',
-
+        'NAME': os.environ.get('DB_NAME', 'car_rental_db'),
+        'USER': os.environ.get('DB_USER', 'home'),
+        'PASSWORD': os.environ.get('DB_PASSWORD', '1234'),
+        # Якщо ми в Докері, візьме 'db', якщо запускаємо локально - візьме 'localhost'
+        'HOST': os.environ.get('DB_HOST', 'localhost'),
+        'PORT': os.environ.get('DB_PORT', '5432'),
     }
 }
 
@@ -142,7 +142,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'UK-uk'
 
-TIME_ZONE = 'Europe/Kiev'
+TIME_ZONE = 'Europe/Kyiv'
 
 USE_I18N = True
 
