@@ -6,7 +6,7 @@ from .models import IncidentReport
 
 class UserLoginForm(LoginForm):
     login = forms.CharField(
-        label="Email або Username",  # Додайте явно label тут
+        label="Email або Username",
         widget=forms.TextInput(attrs={
             'placeholder': 'Введіть Email або Username',
             'class': 'form-control',
@@ -21,7 +21,6 @@ class UserLoginForm(LoginForm):
         })
     )
 
-    # Додайте цей метод, щоб переконатися, що label застосовується
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['login'].label = "Email або Username"
@@ -99,13 +98,15 @@ class ProfileForm(UserChangeForm):
             'last_name',
             'username',
             'email',
+            'is_subscribed', # <-- Додано поле підписки
         )
 
-    iamge = forms.ImageField(required=False)
+    image = forms.ImageField(required=False) # <-- Виправлено друкарську помилку (було iamge)
     first_name = forms.CharField()
     last_name = forms.CharField()
     username = forms.CharField()
     email = forms.CharField()
+    is_subscribed = forms.BooleanField(required=False) # <-- Додано обробку поля (required=False, бо чекбокс може бути порожнім)
 
 
 class IncidentReportForm(forms.ModelForm):
@@ -115,6 +116,5 @@ class IncidentReportForm(forms.ModelForm):
 
     def __init__(self, user, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        # Фільтруємо замовлення, щоб користувач міг вибрати лише свої
         from orders.models import Order
         self.fields['order'].queryset = Order.objects.filter(user=user).order_by('-id')

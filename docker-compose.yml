@@ -11,7 +11,14 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     ports:
-      - "5432:5432"
+      - "5433:5432"
+
+  # --- НОВИЙ СЕРВІС: REDIS ---
+  redis:
+    image: redis:7-alpine
+    container_name: car_rental_redis
+    ports:
+      - "6379:6379"
 
   web:
     build: .
@@ -25,10 +32,31 @@ services:
       - DB_NAME=car_rental_db
       - DB_USER=home
       - DB_PASSWORD=1234
-      - DB_HOST=db  # Це ключовий момент! Ім'я хоста - це ім'я сервісу вище.
+      - DB_HOST=db
       - DB_PORT=5432
+      - CELERY_BROKER_URL=redis://redis:6379/0  # Посилання на Redis
     depends_on:
       - db
+      - redis
+
+  # --- НОВИЙ СЕРВІС: CELERY WORKER ---
+  celery:
+    build: .
+    container_name: car_rental_celery
+    # Команда запускає воркера, який "слухає" задачі
+    command: celery -A car_rental worker --loglevel=info
+    volumes:
+      - .:/app
+    environment:
+      - DB_NAME=car_rental_db
+      - DB_USER=home
+      - DB_PASSWORD=1234
+      - DB_HOST=db
+      - DB_PORT=5432
+      - CELERY_BROKER_URL=redis://redis:6379/0
+    depends_on:
+      - db
+      - redis
 
 volumes:
   postgres_data:

@@ -6,6 +6,7 @@ from cars.models import Cars
 class User(AbstractUser):
     image = models.ImageField(upload_to='users_images', blank=True, null=True, verbose_name='Аватар')
     phone_number = models.CharField(max_length=10, blank=True, null=True)
+    is_subscribed = models.BooleanField(default=True, verbose_name='Підписаний на розсилку')
     class Meta:
         db_table = 'user'
         verbose_name = 'Користувача'
@@ -67,3 +68,34 @@ class FineNotification(models.Model):
         db_table = 'fine_notification'
         verbose_name = 'Штраф'
         verbose_name_plural = 'Штрафи'
+
+
+class Newsletter(models.Model):
+    subject = models.CharField(max_length=255, verbose_name='Тема листа')
+    content = models.TextField(verbose_name='Текст листа (можна HTML)')
+    image = models.ImageField(upload_to='newsletters/', blank=True, null=True, verbose_name='Зображення (опціонально)')
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name='Дата створення')
+    use_target_emails = models.BooleanField(
+        default=False,
+        verbose_name='Відправити тільки на вказані адреси',
+        help_text='Якщо увімкнено — лист піде лише на адреси нижче. Якщо вимкнено — усім підписникам.'
+    )
+
+    # ПОЛЕ ДЛЯ АДРЕС
+    target_emails = models.TextField(
+        blank=True,
+        null=True,
+        verbose_name='Список конкретних Email',
+        help_text='Введіть адреси через кому (наприклад: test@gmail.com, example@mail.com)'
+    )
+    # Це поле допоможе нам знати, чи була ця розсилка вже відправлена
+    is_sent = models.BooleanField(default=False, verbose_name='Відправлено')
+    sent_at = models.DateTimeField(null=True, blank=True, verbose_name='Дата відправки')
+
+    class Meta:
+        verbose_name = 'Розсилка'
+        verbose_name_plural = 'Розсилки'
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return self.subject

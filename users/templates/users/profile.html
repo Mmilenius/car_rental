@@ -56,6 +56,18 @@
                            class="w-full bg-zinc-50 border border-zinc-200 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none transition">
                 </div>
 
+                <div class="mt-6 mb-4 p-4 bg-zinc-50 border border-zinc-200 rounded-xl flex items-center justify-between">
+                    <div>
+                        <h4 class="text-sm font-bold text-zinc-900">Email-розсилка</h4>
+                        <p class="text-[10px] text-zinc-500 mt-0.5">Новинки авто та акції (раз на тиждень)</p>
+                    </div>
+
+                    <label class="relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox" name="is_subscribed" value="True" class="sr-only peer" {% if form.is_subscribed.value %}checked{% endif %}>
+                        <div class="w-11 h-6 bg-zinc-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                    </label>
+                </div>
+
                 <button type="submit" name="update_profile" class="w-full bg-zinc-900 text-white font-bold py-3 rounded-xl hover:bg-zinc-800 transition shadow-lg mt-2">
                     Зберегти зміни
                 </button>
@@ -261,29 +273,24 @@
 
 <script>
     function openTab(tabName) {
-        // Ховаємо весь контент
         document.querySelectorAll('.tab-content').forEach(el => {
             el.classList.add('hidden');
             el.classList.remove('block');
         });
 
-        // Скидаємо стилі всіх кнопок
         document.querySelectorAll('.tab-btn').forEach(el => {
             el.classList.remove('active-tab', 'border-blue-600', 'text-blue-600');
             el.classList.add('border-transparent', 'text-zinc-500');
         });
 
-        // Показуємо потрібний контент
         document.getElementById('content-' + tabName).classList.remove('hidden');
         document.getElementById('content-' + tabName).classList.add('block');
 
-        // Робимо кнопку активною
         let btn = document.getElementById('btn-' + tabName);
         btn.classList.add('active-tab', 'border-blue-600', 'text-blue-600');
         btn.classList.remove('border-transparent', 'text-zinc-500');
     }
 
-    // Якщо ми відправляли форму з інцидентом, варто відразу відкрити вкладку "Підтримка" після перезавантаження
     document.addEventListener("DOMContentLoaded", function() {
         if (window.location.search.includes('tab=support')) {
             openTab('support');
