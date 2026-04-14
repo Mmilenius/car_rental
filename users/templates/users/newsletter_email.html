@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ subject }}</title>
+</head>
+<body style="margin: 0; padding: 0; background-color: #f4f4f5; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">
+    <table width="100%" border="0" cellspacing="0" cellpadding="0" style="background-color: #f4f4f5; padding: 20px 0;">
+        <tr>
+            <td align="center">
+                <table width="600" border="0" cellspacing="0" cellpadding="0" style="background-color: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
+                    <tr>
+                        <td align="center" style="background-color: #18181b; padding: 30px 20px;">
+                            <h1 style="color: #ffffff; margin: 0; font-size: 24px; font-weight: 800; letter-spacing: 1px;">CAR RENTAL</h1>
+                        </td>
+                    </tr>
+
+                    {% if image_url %}
+                    <tr>
+                        <td align="center" style="padding: 0;">
+                            <img src="{{ image_url }}" alt="Зображення розсилки" style="width: 100%; max-width: 600px; height: auto; display: block;">
+                        </td>
+                    </tr>
+                    {% endif %}
+
+                    <tr>
+                        <td style="padding: 40px 30px; color: #3f3f46; font-size: 16px; line-height: 1.6;">
+                            <h2 style="color: #18181b; margin-top: 0; margin-bottom: 20px; font-size: 20px;">{{ subject }}</h2>
+
+                            <div style="margin-bottom: 30px;">
+                                {{ content|linebreaksbr }}
+                            </div>
+
+                            <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                                <tr>
+                                    <td align="center">
+                                        <a href="{{ site_url }}" style="display: inline-block; background-color: #2563eb; color: #ffffff; text-decoration: none; font-weight: bold; padding: 14px 32px; border-radius: 8px; font-size: 16px;">Перейти на сайт</a>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td style="background-color: #fafafa; padding: 20px 30px; border-top: 1px solid #e4e4e7; text-align: center;">
+                            <p style="margin: 0; color: #a1a1aa; font-size: 12px; line-height: 1.5;">
+                                Ви отримали цей лист, тому що підписані на новини сервісу Car Rental.<br>
+                                Якщо ви більше не хочете отримувати розсилку, ви можете вимкнути її в <a href="{{ site_url }}/users/profile/" style="color: #2563eb; text-decoration: underline;">особистому кабінеті</a>.
+                            </p>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>
