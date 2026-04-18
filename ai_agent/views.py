@@ -1,6 +1,4 @@
 import os
-import google.generativeai as genai
-import markdown
 from django.conf import settings
 from django.http import JsonResponse
 from django.views import View
@@ -9,24 +7,33 @@ from django.views.decorators.csrf import csrf_exempt
 from cars.models import Cars, Categories
 from dotenv import load_dotenv
 
+# Спробуємо імпортувати бібліотеки безпечно
+try:
+    import markdown
+except ImportError:
+    markdown = None
+
+try:
+    from google import genai
+    from google.genai import types
+except ImportError:
+    genai = None
+    types = None
+
 # Завантажуємо змінні з .env
 load_dotenv()
 
 # Налаштування API
 GENAI_API_KEY = os.getenv("GEMINI_API_KEY")
-genai.configure(api_key=GENAI_API_KEY)
+client = None
+if genai and GENAI_API_KEY:
+    client = genai.Client(api_key=GENAI_API_KEY)
 
 # --- ІНСТРУМЕНТИ ДЛЯ AI (Functions) ---
 
-def get_available_cars(category_name=None, max_price=None, fuel_type=None):
-    """
-    Повертає список доступних автомобілів за фільтрами.
-    category_name: назва категорії (наприклад, 'Економ', 'Позашляховики')
-    max_price: максимальна ціна за добу
-    fuel_type: тип палива ('petrol', 'diesel', 'hybrid', 'electric')
-    """
+def get_available_cars(category_name: str = None, max_price: float = None, fuel_type: str = None):
+    """Повертає список доступних автомобілів за фільтрами."""
     cars = Cars.objects.all()
-    
     if category_name:
         cars = cars.filter(category__name__icontains=category_name)
     if max_price:
@@ -47,10 +54,8 @@ def get_available_cars(category_name=None, max_price=None, fuel_type=None):
         })
     return result if result else "На жаль, за вашим запитом авто не знайдено."
 
-def get_car_details(car_id):
-    """
-    Повертає повну інформацію про конкретне авто за його ID.
-    """
+def get_car_details(car_id: int):
+    """Повертає повну інформацію про конкретне авто."""
     try:
         car = Cars.objects.get(id=car_id)
         return {
@@ -66,66 +71,82 @@ def get_car_details(car_id):
     except Cars.DoesNotExist:
         return "Авто з таким ID не знайдено."
 
-# --- НАЛАШТУВАННЯ МОДЕЛІ ---
-
-# Створюємо модель з інструментами
-model = genai.GenerativeModel(
-    model_name="gemini-1.5-flash",
-    tools=[get_available_cars, get_car_details],
-    generation_config={
-        "temperature": 0.5, # Менша температура для точніших відповідей
-        "max_output_tokens": 1024,
-    }
-)
+tools = [get_available_cars, get_car_details]
 
 @method_decorator(csrf_exempt, name='dispatch')
 class ChatView(View):
     def post(self, request):
+        if not client:
+            return JsonResponse({'status': 'error', 'answer': 'AI-сервіс не налаштований (відсутній ключ або бібліотеки).'})
+
         user_message = request.POST.get('message', '')
         image_file = request.FILES.get('image')
 
-        # Системна інструкція
+        # Отримуємо або ініціалізуємо історію з сесії
+        history = request.session.get('chat_history', [])
+
         system_instruction = """
         Ти - експертний асистент сервісу 'Car Rental'. 
-        Твоє завдання: допомогти клієнту підібрати ідеальне авто.
+        Твоє завдання: допомогти клієнту підібрати ідеальне авто, використовуючи доступні інструменти.
         
         ПРАВИЛА:
-        1. Використовуй інструмент `get_available_cars`, щоб дізнатися, які авто є в наявності.
-        2. Якщо клієнт зацікавився конкретним авто, використовуй `get_car_details`, щоб дати повний опис.
-        3. Завжди кажи ціни та умови оренди (запорука, вік).
-        4. Спілкуйся українською мовою, будь професійним та дружнім.
-        5. Якщо на фото авто, яке ми маємо (або схоже), запропонуй його.
+        1. Якщо клієнт надає параметри (тип кузова, бюджет, паливо), НЕГАЙНО викликай функцію `get_available_cars`.
+        2. Якщо клієнт питає про конкретне авто, використовуй `get_car_details`.
+        3. Якщо клієнт просить "економічне" авто, шукай у категорії "Бюджетні" або з низькою ціною.
+        4. Не вітайся кожного разу, якщо діалог уже триває.
+        5. Спілкуйся українською мовою.
+        6. Якщо у відповіді від інструментів є список авто, красиво оформи його маркдауном.
         """
 
         try:
-            # Створюємо чат з підтримкою автоматичного виклику інструментів (enable_automatic_function_calling)
-            chat = model.start_chat(enable_automatic_function_calling=True)
-            
-            # Формуємо запит
-            content = [user_message]
+            # Формуємо контент для поточного запиту
+            current_content = {"role": "user", "parts": [{"text": user_message}]}
             
             if image_file:
-                image_data = {
-                    'mime_type': image_file.content_type,
-                    'data': image_file.read()
-                }
-                content.append(image_data)
-                content.append("Клієнт надіслав фото. Перевір, чи є у нас таке авто або схоже, використовуючи інструменти пошуку.")
+                image_bytes = image_file.read()
+                current_content["parts"].append(
+                    types.Part.from_bytes(data=image_bytes, mime_type=image_file.content_type)
+                )
 
-            # Надсилаємо повідомлення
-            # Ми додаємо системну інструкцію в перший запит, якщо це початок чату
-            response = chat.send_message(
-                [system_instruction] + content
+            # Формуємо повний список повідомлень для моделі
+            messages = []
+            for msg in history:
+                messages.append(types.Content(role=msg['role'], parts=[types.Part(text=msg['text'])]))
+            
+            # Додаємо поточне повідомлення (без картинки для простоти збереження в сесії, або з нею якщо треба)
+            # Але в SDK ми передаємо об'єкти Content
+            current_parts = [types.Part(text=user_message)]
+            if image_file:
+                current_parts.append(types.Part.from_bytes(data=image_bytes, mime_type=image_file.content_type))
+            
+            messages.append(types.Content(role="user", parts=current_parts))
+
+            response = client.models.generate_content(
+                model="gemini-3.1-flash-lite-preview",
+                contents=messages,
+                config=types.GenerateContentConfig(
+                    system_instruction=system_instruction,
+                    tools=tools,
+                    automatic_function_calling=types.AutomaticFunctionCallingConfig(),
+                ),
             )
             
             ai_reply = response.text
-            ai_reply_html = markdown.markdown(ai_reply)
+            
+            # Оновлюємо історію в сесії (зберігаємо лише текст для економії місця)
+            history.append({"role": "user", "text": user_message})
+            history.append({"role": "model", "text": ai_reply})
+            
+            # Обмежуємо історію останніми 10 повідомленнями
+            request.session['chat_history'] = history[-10:]
+
+            if markdown:
+                ai_reply_html = markdown.markdown(ai_reply)
+            else:
+                ai_reply_html = ai_reply
 
             return JsonResponse({'status': 'ok', 'answer': ai_reply_html})
 
         except Exception as e:
             print(f"Chat Error: {e}")
-            return JsonResponse({
-                'status': 'error',
-                'answer': 'Вибачте, сталася технічна помилка. Спробуйте пізніше.'
-            })
+            return JsonResponse({'status': 'error', 'answer': f'Помилка: {str(e)}'})

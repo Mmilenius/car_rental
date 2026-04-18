@@ -23,7 +23,7 @@ typing_extensions==4.13.2
 tzdata==2025.2
 urllib3==2.5.0
 python-dotenv
-google-generativeai
+google-genai
 markdown
 celery==5.3.6
 redis==5.0.1
