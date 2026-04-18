@@ -24,6 +24,8 @@ services:
     build: .
     container_name: car_rental_web
     command: python manage.py runserver 0.0.0.0:8000
+    env_file:
+      - .env
     volumes:
       - .:/app
     ports:
@@ -45,6 +47,8 @@ services:
     container_name: car_rental_celery
     # Команда запускає воркера, який "слухає" задачі
     command: celery -A car_rental worker --loglevel=info
+    env_file:
+      - .env
     volumes:
       - .:/app
     environment:
